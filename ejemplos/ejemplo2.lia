@@ -1,0 +1,59 @@
+$ Ejemplo 2: Tipos de datos y operadores
+
+$ Declaraciones de variables
+int entero;
+float flotante;
+char caracter;
+string cadena;
+bool bandera;
+
+$ Asignaciones
+entero = 42;
+flotante = 3.14;
+caracter = 'A';
+cadena = "Hola Mundo";
+bandera = true;
+
+$ Operadores aritméticos
+int suma;
+int resta;
+int mult;
+int div;
+int mod;
+
+suma = 10 + 5;
+resta = 10 - 5;
+mult = 10 * 5;
+div = 10 / 5;
+mod = 10 % 3;
+
+$ Operadores relacionales
+bool mayor;
+bool menor;
+bool igual;
+bool diferente;
+
+mayor = 10 > 5;
+menor = 10 < 5;
+igual = 10 == 10;
+diferente = 10 != 5;
+
+$ Operadores lógicos
+bool resultado_and;
+bool resultado_or;
+bool resultado_not;
+
+resultado_and = true && false;
+resultado_or = true || false;
+resultado_not = !true;
+
+$ Estructuras de control
+while entero > 0
+    output entero;
+    entero = entero - 1;
+
+do
+    output "Loop";
+loop
+
+$ Fin del programa

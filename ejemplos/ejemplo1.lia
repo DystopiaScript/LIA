@@ -1,0 +1,23 @@
+$ Ejemplo 1: Programa simple en LIA
+$ Este archivo demuestra la sintaxis básica del lenguaje
+
+class MiClase
+    int x;
+    float y;
+    
+    def suma(int a, int b) to int
+        int resultado;
+        resultado = a + b;
+        output resultado;
+endclass
+
+$ Programa principal
+int main_var;
+main_var = 10;
+
+if main_var > 5
+    output main_var;
+else
+    output 0;
+
+$ Fin del programa
