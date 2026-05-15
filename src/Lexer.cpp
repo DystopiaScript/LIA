@@ -156,68 +156,115 @@ Lexer::~Lexer() {
 // ========== FUNCIÓN PRINCIPAL DE ANÁLISIS ==========
 
 void Lexer::Analiza() {
-    /**
-     * TODO: Implementar el algoritmo principal del análisis léxico
-     * 
-     * Algoritmo:
-     * 1. Reiniciar estado: currentState = 0, currentPos = 0, limpiar tokens y errores
-     * 2. Mientras currentPos < sourceCode.length():
-     *    a. Obtener carácter actual: char c = sourceCode[currentPos]
-     *    b. Mapear a columna: int col = relaciona(c)
-     *    c. Obtener siguiente estado: int nextState = MATRIZ_TRANSICION[currentState][col]
-     *    d. Analizar el siguiente estado:
-     *       - Si nextState >= 100 && nextState < 200: Estado de aceptación
-     *         * Llamar Token(lexemeBuffer, nextState)
-     *         * Limpiar lexemeBuffer
-     *         * Reiniciar currentState = 0
-     *         * Considerar si necesita backtrack (ungetChar)
-     *       - Si nextState >= 500: Estado de error
-     *         * Llamar Error(nextState, c)
-     *         * Ejecutar modo pánico: skipToNextDelimiter()
-     *         * Limpiar lexemeBuffer
-     *         * Reiniciar currentState = 0
-     *       - Si nextState == 0: Whitespace o comentario
-     *         * No acumular en lexemeBuffer
-     *         * Actualizar posición y línea/columna
-     *       - Si 0 < nextState < 100: Estado de transición
-     *         * Acumular carácter: lexemeBuffer += c
-     *         * Actualizar currentState = nextState
-     *         * Avanzar posición
-     *    e. Actualizar currentLine si c == '\n'
-     * 3. Al final, verificar si quedó un token pendiente en lexemeBuffer
-     * 
-     * Ejemplo de estructura:
-     * 
-     * reset();  // Limpiar estado anterior
-     * 
-     * while (currentPos < sourceCode.length()) {
-     *     char c = getChar();  // Obtiene y avanza
-     *     int col = relaciona(c);
-     *     int nextState = MATRIZ_TRANSICION[currentState][col];
-     *     
-     *     if (nextState >= 100 && nextState < 200) {
-     *         // Token reconocido
-     *         Token(lexemeBuffer, nextState);
-     *         lexemeBuffer.clear();
-     *         currentState = 0;
-     *     } else if (nextState >= 500) {
-     *         // Error
-     *         Error(nextState, c);
-     *         skipToNextDelimiter();
-     *         lexemeBuffer.clear();
-     *         currentState = 0;
-     *     } else if (nextState == 0) {
-     *         // Whitespace - no acumular
-     *         // Ya avanzamos con getChar()
-     *     } else {
-     *         // Estado de transición - acumular
-     *         lexemeBuffer += c;
-     *         currentState = nextState;
-     *     }
-     * }
-     */
+    // Reiniciar estado
+    reset();
     
-    // TODO: Implementar aquí
+    // Procesar todo el código fuente
+    while (currentPos < sourceCode.length()) {
+        char c = peekChar();
+        
+        // Obtener columna de la matriz de transición
+        int col = relaciona(c);
+        
+        // Obtener siguiente estado
+        int nextState = MATRIZ_TRANSICION[currentState][col];
+        
+        // Analizar el siguiente estado
+        if (nextState >= 100 && nextState < 200) {
+            // ===== ESTADO DE ACEPTACIÓN =====
+            
+            // Algunos tokens necesitan incluir el carácter actual
+            bool incluirCaracter = false;
+            
+            // Tokens de un solo carácter que se aceptan inmediatamente
+            if (nextState == 105 || nextState == 106 || nextState == 107 || 
+                nextState == 108 || nextState == 128 || nextState == 119 || 
+                nextState == 120 || nextState == 121 || nextState == 122 || 
+                nextState == 123 || nextState == 124 || nextState == 131 ||
+                nextState == 129 || nextState == 130) {
+                incluirCaracter = true;
+            }
+            
+            // Operadores de dos caracteres
+            if (nextState == 110 || nextState == 112 || nextState == 113 || 
+                nextState == 115 || nextState == 117 || nextState == 118) {
+                incluirCaracter = true;
+            }
+            
+            // Constantes de carácter y string
+            if (nextState == 125 || nextState == 126) {
+                incluirCaracter = true;
+            }
+            
+            // Comentarios
+            if (nextState == 127) {
+                // Los comentarios no generan tokens, solo limpiar
+                lexemeBuffer.clear();
+                currentState = 0;
+                getChar();  // Consumir el \n
+                continue;
+            }
+            
+            // Incluir carácter si es necesario
+            if (incluirCaracter) {
+                lexemeBuffer += c;
+                getChar();  // Consumir el carácter
+            }
+            
+            // Crear el token
+            if (!lexemeBuffer.empty()) {
+                Token(lexemeBuffer, nextState);
+            }
+            
+            // Limpiar y reiniciar
+            lexemeBuffer.clear();
+            currentState = 0;
+            
+            // Si no incluimos el carácter, no avanzamos (backtrack implícito)
+            // El siguiente ciclo procesará este carácter desde estado 0
+            
+        } else if (nextState >= 500) {
+            // ===== ESTADO DE ERROR =====
+            
+            // Reportar el error
+            Error(nextState, c);
+            
+            // Modo pánico: saltar hasta el siguiente delimitador
+            skipToNextDelimiter();
+            
+            // Limpiar y reiniciar
+            lexemeBuffer.clear();
+            currentState = 0;
+            
+        } else if (nextState == 0) {
+            // ===== WHITESPACE O RETORNO A ESTADO INICIAL =====
+            
+            // Si estamos en estado 0 y vamos a estado 0, es whitespace
+            if (currentState == 0) {
+                getChar();  // Consumir y descartar
+            } else {
+                // Transición desde otro estado a 0 (no debería pasar normalmente)
+                currentState = 0;
+            }
+            
+        } else {
+            // ===== ESTADO DE TRANSICIÓN (1-99) =====
+            
+            // Acumular carácter en el buffer
+            lexemeBuffer += c;
+            
+            // Actualizar estado
+            currentState = nextState;
+            
+            // Avanzar posición
+            getChar();
+        }
+    }
+    
+    // Al final, verificar si quedó un token pendiente
+    if (!lexemeBuffer.empty() && currentState >= 100 && currentState < 200) {
+        Token(lexemeBuffer, currentState);
+    }
 }
 
 // ========== FUNCIONES AUXILIARES DEL ANÁLISIS ==========
@@ -281,245 +328,135 @@ int Lexer::relaciona(char c) {
 }
 
 void Lexer::Token(const std::string& lexema, int estadoAceptacion) {
-    /**
-     * TODO: Implementar la clasificación y creación de tokens
-     * 
-     * Pasos:
-     * 1. Determinar el gramema según el estado de aceptación
-     * 2. Caso especial: estado 100 puede ser palabra reservada o identificador
-     *    - Verificar si está en PALABRAS_RESERVADAS
-     *    - Si está: gramema = 100 (palabra reservada)
-     *    - Si no está: verificar que sea identificador válido (isValidIdentifier)
-     *      * Si es válido: gramema = 101 (identificador)
-     *      * Si no es válido: reportar error y retornar
-     * 3. Crear objeto Token con: lexema, gramema, currentLine, currentColumn
-     * 4. Agregar a la lista: tokens.push_back(token)
-     * 
-     * Ejemplo:
-     * 
-     * int gramema = estadoAceptacion;
-     * 
-     * if (estadoAceptacion == 100) {
-     *     if (isReservedWord(lexema)) {
-     *         gramema = 100;  // Palabra reservada
-     *     } else {
-     *         if (!isValidIdentifier(lexema)) {
-     *             Error(508, lexema[lexema.length()-1]);
-     *             return;
-     *         }
-     *         gramema = 101;  // Identificador
-     *     }
-     * }
-     * 
-     * Token token(lexema, gramema, currentLine, currentColumn - lexema.length());
-     * tokens.push_back(token);
-     */
+    int gramema = estadoAceptacion;
     
-    // TODO: Implementar aquí
+    // Caso especial: estado 100 puede ser palabra reservada o identificador
+    if (estadoAceptacion == 100) {
+        if (isReservedWord(lexema)) {
+            gramema = 100;  // Palabra reservada
+        } else {
+            if (!isValidIdentifier(lexema)) {
+                Error(508, lexema.empty() ? '\0' : lexema[lexema.length()-1]);
+                return;
+            }
+            gramema = 101;  // Identificador
+        }
+    }
+    
+    // Crear el token con la posición donde comenzó (aproximada)
+    ::Token token(lexema, gramema, currentLine, currentColumn - lexema.length());
+    tokens.push_back(token);
 }
 
 void Lexer::Error(int estadoError, char caracterProblematico) {
-    /**
-     * TODO: Implementar el reporte de errores
-     * 
-     * Pasos:
-     * 1. Crear objeto Error con:
-     *    - currentLine
-     *    - currentColumn
-     *    - estadoError
-     *    - string(1, caracterProblematico) o lexemeBuffer si es más apropiado
-     * 2. Agregar a la lista: errors.push_back(error)
-     * 3. Ejecutar modo pánico: skipToNextDelimiter()
-     * 4. Reiniciar estado: currentState = 0, lexemeBuffer.clear()
-     * 
-     * Ejemplo:
-     * 
-     * Error error(currentLine, currentColumn, estadoError, std::string(1, caracterProblematico));
-     * errors.push_back(error);
-     */
-    
-    // TODO: Implementar aquí
+    ::Error error(currentLine, currentColumn, estadoError, std::string(1, caracterProblematico));
+    errors.push_back(error);
 }
 
 // ========== FUNCIONES DE NAVEGACIÓN DEL CÓDIGO ==========
 
 char Lexer::peekChar() {
-    /**
-     * TODO: Implementar peek (ver sin consumir)
-     * 
-     * Retorna el siguiente carácter sin avanzar currentPos
-     * Si currentPos >= sourceCode.length(), retornar '\0'
-     * 
-     * Ejemplo:
-     * if (currentPos < sourceCode.length()) {
-     *     return sourceCode[currentPos];
-     * }
-     * return '\0';
-     */
-    
-    // TODO: Implementar aquí
-    return '\0';
+    // Verificar que no hayamos llegado al final del código
+    if (currentPos < sourceCode.length()) {
+        return sourceCode[currentPos];  // Retornar sin avanzar
+    }
+    return '\0';  // Fin del archivo
 }
 
 char Lexer::getChar() {
-    /**
-     * TODO: Implementar get (obtener y consumir)
-     * 
-     * Pasos:
-     * 1. Verificar que currentPos < sourceCode.length()
-     * 2. Obtener carácter: char c = sourceCode[currentPos]
-     * 3. Avanzar posición: currentPos++
-     * 4. Actualizar columna: currentColumn++
-     * 5. Si c == '\n': currentLine++, currentColumn = 1
-     * 6. Retornar c
-     * 
-     * Ejemplo:
-     * if (currentPos >= sourceCode.length()) {
-     *     return '\0';
-     * }
-     * char c = sourceCode[currentPos++];
-     * if (c == '\n') {
-     *     currentLine++;
-     *     currentColumn = 1;
-     * } else {
-     *     currentColumn++;
-     * }
-     * return c;
-     */
+    // Verificar que no hayamos llegado al final
+    if (currentPos >= sourceCode.length()) {
+        return '\0';  // Fin del archivo
+    }
     
-    // TODO: Implementar aquí
-    return '\0';
+    // Obtener el carácter actual
+    char c = sourceCode[currentPos];
+    
+    // Avanzar la posición
+    currentPos++;
+    
+    // Actualizar línea y columna
+    if (c == '\n') {
+        currentLine++;      // Nueva línea
+        currentColumn = 1;  // Reiniciar columna
+    } else {
+        currentColumn++;    // Avanzar columna
+    }
+    
+    return c;
 }
 
 void Lexer::ungetChar() {
-    /**
-     * TODO: Implementar backtrack (retroceder)
-     * 
-     * Usado cuando el último carácter leído no pertenece al token actual
-     * 
-     * Pasos:
-     * 1. Verificar que currentPos > 0
-     * 2. Retroceder: currentPos--
-     * 3. Actualizar columna: currentColumn--
-     * 4. Si el carácter retrocedido es '\n', ajustar currentLine
-     *    (esto es complicado, puede requerir buscar hacia atrás)
-     * 
-     * Nota: Para simplificar, puede no ajustar currentLine si es complejo
-     * 
-     * Ejemplo:
-     * if (currentPos > 0) {
-     *     currentPos--;
-     *     currentColumn--;
-     * }
-     */
-    
-    // TODO: Implementar aquí
+    // Verificar que podemos retroceder
+    if (currentPos > 0) {
+        currentPos--;       // Retroceder posición
+        currentColumn--;    // Retroceder columna
+        
+        // Nota: No ajustamos currentLine porque es complejo
+        // y raramente retrocedemos a través de un \n
+        // Si fuera necesario, tendríamos que buscar hacia atrás
+    }
 }
 
 // ========== FUNCIONES DE VALIDACIÓN ==========
 
 bool Lexer::isReservedWord(const std::string& lexema) {
-    /**
-     * TODO: Implementar verificación de palabra reservada
-     * 
-     * Buscar lexema en PALABRAS_RESERVADAS
-     * 
-     * Ejemplo:
-     * return PALABRAS_RESERVADAS.find(lexema) != PALABRAS_RESERVADAS.end();
-     */
-    
-    // TODO: Implementar aquí
-    return false;
+    return PALABRAS_RESERVADAS.find(lexema) != PALABRAS_RESERVADAS.end();
 }
 
 bool Lexer::isValidIdentifier(const std::string& lexema) {
-    /**
-     * TODO: Implementar validación de identificador
-     * 
-     * Reglas:
-     * 1. No puede terminar con '_'
-     * 2. No puede tener '__' (dos guiones bajos consecutivos)
-     * 
-     * Ejemplo:
-     * // Verificar que no termina con _
-     * if (lexema.empty() || lexema[lexema.length() - 1] == '_') {
-     *     return false;
-     * }
-     * 
-     * // Verificar que no tiene __ consecutivos
-     * for (size_t i = 0; i < lexema.length() - 1; i++) {
-     *     if (lexema[i] == '_' && lexema[i+1] == '_') {
-     *         return false;
-     *     }
-     * }
-     * 
-     * return true;
-     */
+    // Verificar que no está vacío
+    if (lexema.empty()) {
+        return false;
+    }
     
-    // TODO: Implementar aquí
+    // Verificar que no termina con _
+    if (lexema[lexema.length() - 1] == '_') {
+        return false;
+    }
+    
+    // Verificar que no tiene __ consecutivos
+    for (size_t i = 0; i < lexema.length() - 1; i++) {
+        if (lexema[i] == '_' && lexema[i+1] == '_') {
+            return false;
+        }
+    }
+    
     return true;
 }
 
 // ========== FUNCIONES DE RECUPERACIÓN DE ERRORES ==========
 
 void Lexer::skipToNextDelimiter() {
-    /**
-     * TODO: Implementar modo pánico
-     * 
-     * Saltar caracteres hasta encontrar un delimitador o whitespace
-     * Delimitadores: ; , ( ) [ ] { } espacio \t \n
-     * 
-     * Ejemplo:
-     * while (currentPos < sourceCode.length()) {
-     *     char c = peekChar();
-     *     if (c == ';' || c == ',' || c == '(' || c == ')' ||
-     *         c == '[' || c == ']' || c == '{' || c == '}' ||
-     *         c == ' ' || c == '\t' || c == '\n') {
-     *         break;
-     *     }
-     *     getChar();  // Consumir y descartar
-     * }
-     */
-    
-    // TODO: Implementar aquí
+    while (currentPos < sourceCode.length()) {
+        char c = peekChar();
+        if (c == ';' || c == ',' || c == '(' || c == ')' ||
+            c == '[' || c == ']' || c == '{' || c == '}' ||
+            c == ' ' || c == '\t' || c == '\n') {
+            break;
+        }
+        getChar();  // Consumir y descartar
+    }
 }
 
 void Lexer::skipWhitespace() {
-    /**
-     * TODO: Implementar salto de espacios en blanco
-     * 
-     * Consumir espacios, tabulaciones y nuevas líneas
-     * 
-     * Ejemplo:
-     * while (currentPos < sourceCode.length()) {
-     *     char c = peekChar();
-     *     if (c != ' ' && c != '\t' && c != '\n') {
-     *         break;
-     *     }
-     *     getChar();  // Consumir
-     * }
-     */
-    
-    // TODO: Implementar aquí
+    while (currentPos < sourceCode.length()) {
+        char c = peekChar();
+        if (c != ' ' && c != '\t' && c != '\n') {
+            break;
+        }
+        getChar();  // Consumir
+    }
 }
 
 void Lexer::skipComment() {
-    /**
-     * TODO: Implementar salto de comentario
-     * 
-     * Consumir desde $ hasta \n (inclusive)
-     * 
-     * Ejemplo:
-     * // Asumiendo que ya se leyó el $
-     * while (currentPos < sourceCode.length()) {
-     *     char c = getChar();
-     *     if (c == '\n') {
-     *         break;
-     *     }
-     * }
-     */
-    
-    // TODO: Implementar aquí
+    // Asumiendo que ya se leyó el $
+    while (currentPos < sourceCode.length()) {
+        char c = getChar();
+        if (c == '\n') {
+            break;
+        }
+    }
 }
 
 // ========== FUNCIONES DE ACCESO A RESULTADOS ==========
@@ -563,32 +500,16 @@ void Lexer::reset() {
 }
 
 bool Lexer::loadFromFile(const std::string& filename) {
-    /**
-     * TODO: Implementar carga desde archivo
-     * 
-     * Pasos:
-     * 1. Abrir archivo con std::ifstream
-     * 2. Verificar que se abrió correctamente
-     * 3. Leer todo el contenido a sourceCode
-     * 4. Cerrar archivo
-     * 5. Llamar reset()
-     * 6. Retornar true si éxito, false si error
-     * 
-     * Ejemplo:
-     * std::ifstream file(filename);
-     * if (!file.is_open()) {
-     *     return false;
-     * }
-     * 
-     * std::string content((std::istreambuf_iterator<char>(file)),
-     *                      std::istreambuf_iterator<char>());
-     * file.close();
-     * 
-     * sourceCode = content;
-     * reset();
-     * return true;
-     */
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        return false;
+    }
     
-    // TODO: Implementar aquí
-    return false;
+    std::string content((std::istreambuf_iterator<char>(file)),
+                         std::istreambuf_iterator<char>());
+    file.close();
+    
+    sourceCode = content;
+    reset();
+    return true;
 }
