@@ -41,11 +41,11 @@ enum Gramema {
     
     // Operadores de asignación y relacionales
     OP_ASIGNACION = 109,         // =
-    OP_IGUALDAD = 110,           // ==
+    OP_IGUALDAD = 110,           // == 
     OP_MENOR = 111,              // <
     OP_MENOR_IGUAL = 112,        // <=
-    OP_MAYOR_IGUAL = 113,        // >=
-    OP_MAYOR = 114,              // >
+    OP_MAYOR_IGUAL = 113,        // >= //estan al reves
+    OP_MAYOR = 114,              // >  //estan al reves
     OP_DIFERENTE = 115,          // !=
     
     // Operadores lógicos

@@ -35,64 +35,83 @@ const int Lexer::MATRIZ_TRANSICION[NUM_ESTADOS][NUM_COLUMNAS] = {
     //  0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
     //  L    l    d    _    .    E    e    +    -    *    /    %    =    <    >    !    &    |    (    )    [    ]    {    }    ;    ,    :    '    "    $   \t   \n   sp  otro
     
-    // Estado 0: Estado inicial
+    // Estado 0: Estado inicial - Basado en el diagrama del PDF página 4
     {   1,   1,   3, 500, 500,   1,   1, 105, 106, 107, 108, 128,   9,  11,  12,  13,  14,  18, 119, 120, 121, 122, 129, 130, 123, 124, 131,  15,  17,  19,   0,   0,   0, 500},
     
-    // Estado 1: Identificador/palabra reservada (acumula letras y dígitos)
+    // Estado 1: Identificador/palabra reservada (acumula L|l|d)
+    // Transiciones: L|l|d → 1 (loop), _ → 2, dif → 100
     {   1,   1,   1,   2, 100,   1,   1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100},
     
     // Estado 2: Después de guión bajo en identificador
+    // Transiciones: L|l|d → 1, _ → 508 (error: __ consecutivos), dif → 101
     {   1,   1,   1, 508, 101,   1,   1, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101},
     
     // Estado 3: Número entero (acumula dígitos)
+    // Transiciones: d → 3 (loop), . → 4, dif → 102 (entero)
     { 102, 102,   3, 102,   4, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102},
     
     // Estado 4: Después del punto decimal (esperando dígitos)
+    // Transiciones: d → 5, otro → 501 (error: esperaba dígitos después del punto)
     { 501, 501,   5, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501},
     
     // Estado 5: Número flotante (acumula dígitos después del punto)
+    // Transiciones: d → 5 (loop), E|e → 6, dif → 103 (flotante)
     { 103, 103,   5, 103, 103,   6,   6, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103},
     
-    // Estado 6: Después de E/e en notación científica (esperando signo o dígito)
+    // Estado 6: Después de E/e en notación científica
+    // Transiciones: +|- → 7, d → 8, otro → 502 (error: esperaba +, - o dígito)
     { 502, 502,   8, 502, 502, 502, 502,   7,   7, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502},
     
     // Estado 7: Después de signo en exponente (esperando dígito)
+    // Transiciones: d → 8, otro → 503 (error: esperaba dígito en exponente)
     { 503, 503,   8, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503},
     
     // Estado 8: Exponente de notación científica (acumula dígitos)
+    // Transiciones: d → 8 (loop), dif → 104 (notación científica)
     { 104, 104,   8, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104},
     
     // Estado 9: Después de = (puede ser = o ==)
+    // Transiciones: = → 110 (==), dif → 109 (=)
     { 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 110, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109},
     
-    // Estado 10: (No usado - reservado para expansión futura)
+    // Estado 10: Después de / (puede ser división o inicio de comentario - NO USADO en este diseño)
+    // El comentario usa $ según el PDF, no //
     { 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500},
     
     // Estado 11: Después de < (puede ser < o <=)
+    // Transiciones: = → 112 (<=), dif → 111 (<)
     { 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 112, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111},
     
     // Estado 12: Después de > (puede ser > o >=)
+    // Transiciones: = → 113 (>=), dif → 114 (>)
     { 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 113, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114},
     
     // Estado 13: Después de ! (puede ser ! o !=)
+    // Transiciones: = → 115 (!=), dif → 116 (!)
     { 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 115, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116},
     
     // Estado 14: Después de & (esperando segundo &)
+    // Transiciones: & → 117 (&&), dif → 504 (error: esperaba &&)
     { 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 117, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504},
     
-    // Estado 15: Después de comilla simple (esperando carácter)
+    // Estado 15: Después de comilla simple ' (esperando carácter)
+    // Transiciones: cualquier_char → 16, ' → 505 (error: vacío)
     {  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16, 505,  16,  16,  16,  16,  16,  16},
     
     // Estado 16: Carácter dentro de comillas simples (esperando comilla de cierre)
+    // Transiciones: ' → 125 (constante carácter), otro → 505 (error: sin cerrar)
     { 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 125, 505, 505, 505, 505, 505, 505},
     
-    // Estado 17: Dentro de string (acumula hasta encontrar ")
+    // Estado 17: Dentro de string " (acumula hasta encontrar ")
+    // Transiciones: cualquier_char → 17 (loop), " → 126 (string), \n → 507 (error: sin cerrar)
     {  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17, 126,  17,  17, 507,  17,  17},
     
     // Estado 18: Después de | (esperando segundo |)
+    // Transiciones: | → 118 (||), dif → 509 (error: esperaba ||)
     { 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 118, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509},
     
-    // Estado 19: Dentro de comentario (acumula hasta encontrar \n)
+    // Estado 19: Dentro de comentario $ (acumula hasta encontrar \n)
+    // Transiciones: cualquier_char → 19 (loop), \n → 127 (comentario completo)
     {  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19, 127,  19,  19}
 };
 
@@ -102,14 +121,6 @@ const int Lexer::MATRIZ_TRANSICION[NUM_ESTADOS][NUM_COLUMNAS] = {
  * Agregar las 17 palabras reservadas del lenguaje LIA:
  * class, endclass, int, float, char, string, bool,
  * if, else, do, while, input, output, def, to, break, loop
- * 
- * Ejemplo:
- * const std::map<std::string, int> Lexer::PALABRAS_RESERVADAS = {
- *     {"class", 100},
- *     {"endclass", 100},
- *     {"int", 100},
- *     // ... resto de palabras
- * };
  */
 const std::map<std::string, int> Lexer::PALABRAS_RESERVADAS = {
     {"class", 100},

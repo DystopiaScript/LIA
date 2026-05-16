@@ -20,7 +20,7 @@ Token::Token(const std::string& lex, int gram, int lin, int col)
 // Convierte el token a string para visualización
 std::string Token::toString() const {
     return "Línea " + std::to_string(linea) + ", Col " + std::to_string(columna) + 
-           ": " + lexema + " [" + getGramemaName() + "]";
+        ": " + lexema + " [" + getGramemaName() + "]";
 }
 
 // Obtiene el nombre legible del gramema

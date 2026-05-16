@@ -1,14 +1,6 @@
 #include <QApplication>
 #include "MainWindow.h"
 
-/**
- * @file main.cpp
- * @brief Punto de entrada de la aplicación del analizador léxico LIA
- * 
- * Este archivo contiene la función main que inicializa la aplicación Qt
- * y muestra la ventana principal.
- */
-
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     
