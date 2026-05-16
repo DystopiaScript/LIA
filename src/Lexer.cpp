@@ -224,7 +224,7 @@ void Lexer::Analiza() {
             
             // Crear el token
             if (!lexemeBuffer.empty()) {
-                Token(lexemeBuffer, nextState);
+                addToken(lexemeBuffer, nextState);
             }
             
             // Limpiar y reiniciar
@@ -238,7 +238,7 @@ void Lexer::Analiza() {
             // ===== ESTADO DE ERROR =====
             
             // Reportar el error
-            Error(nextState, c);
+            addError(nextState, c);
             
             // Modo pánico: saltar hasta el siguiente delimitador
             skipToNextDelimiter();
@@ -274,7 +274,7 @@ void Lexer::Analiza() {
     
     // Al final, verificar si quedó un token pendiente
     if (!lexemeBuffer.empty() && currentState >= 100 && currentState < 200) {
-        Token(lexemeBuffer, currentState);
+        addToken(lexemeBuffer, currentState);
     }
 }
 
@@ -338,7 +338,7 @@ int Lexer::relaciona(char c) {
     }
 }
 
-void Lexer::Token(const std::string& lexema, int estadoAceptacion) {
+void Lexer::addToken(const std::string& lexema, int estadoAceptacion) {
     int gramema = estadoAceptacion;
     
     // Caso especial: estado 100 puede ser palabra reservada o identificador
@@ -347,7 +347,7 @@ void Lexer::Token(const std::string& lexema, int estadoAceptacion) {
             gramema = 100;  // Palabra reservada
         } else {
             if (!isValidIdentifier(lexema)) {
-                Error(508, lexema.empty() ? '\0' : lexema[lexema.length()-1]);
+                addError(508, lexema.empty() ? '\0' : lexema[lexema.length()-1]);
                 return;
             }
             gramema = 101;  // Identificador
@@ -359,7 +359,7 @@ void Lexer::Token(const std::string& lexema, int estadoAceptacion) {
     tokens.push_back(token);
 }
 
-void Lexer::Error(int estadoError, char caracterProblematico) {
+void Lexer::addError(int estadoError, char caracterProblematico) {
     ::Error error(currentLine, currentColumn, estadoError, std::string(1, caracterProblematico));
     errors.push_back(error);
 }

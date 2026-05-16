@@ -186,7 +186,7 @@ public:
      * 
      * TODO: Implementar clasificación y validación
      */
-    void Token(const std::string& lexema, int estadoAceptacion);
+    void addToken(const std::string& lexema, int estadoAceptacion);
     
     /**
      * @brief Reporta un error léxico
@@ -201,7 +201,7 @@ public:
      * 
      * TODO: Implementar reporte y recuperación
      */
-    void Error(int estadoError, char caracterProblematico);
+    void addError(int estadoError, char caracterProblematico);
     
     // ========== FUNCIONES DE NAVEGACIÓN DEL CÓDIGO ==========
     /**
