@@ -24,16 +24,15 @@
  * - Cada código representa un tipo específico de error léxico
  */
 enum CodigoError {
-    ERROR_GENERAL = 500,              // Carácter no reconocido por el lenguaje
-    ERROR_FLOTANTE = 501,             // Punto decimal sin dígitos después
-    ERROR_CIENTIFICA_SIGNO = 502,     // E/e no seguido de +, - o dígito
-    ERROR_CIENTIFICA_EXPONENTE = 503, // Signo sin dígitos en exponente
-    ERROR_AND = 504,                  // Un solo & (debería ser &&)
-    ERROR_CARACTER = 505,             // Comilla simple sin cerrar
-    ERROR_WHITESPACE = 506,           // Carácter de control inválido
-    ERROR_STRING = 507,               // Comilla doble sin cerrar
-    ERROR_IDENTIFICADOR_GUION = 508,  // __ consecutivos o termina en _
-    ERROR_OR = 509                    // Un solo | (debería ser ||)
+    ERROR_FLOTANTE_ESPERA_DIGITOS = 500,                 // Valor flotante que espera digitos después del punto
+    ERROR_CIENTIFICA_ESPERA_DIGITO_O_SIGNO = 501,        // Para la notacion cientifica, espera digitos, + o -
+    ERROR_CIENTIFICA_DESPUES_SIGNO_ESPERA_DIGITOS = 502, // Para la notacion cientifica, despues de + o -, espera digitos
+    ERROR_AND_ESPERA_OTRO_AMPERSAND = 503,               // Error lexico, se espera otro &, para AND
+    ERROR_OR_ESPERA_OTRO_PIPE = 504,                     // Error, se espera otro |, para OR
+    ERROR_CHAR_DOS_COMILLAS_SIMPLES = 505,               // Dos comillas simples, error al declarar char (vacío)
+    ERROR_LEXICO_NO_RECONOCE_LENGUAJE = 506,             // Error lexico, no se reconoce el lenguaje
+    ERROR_CHAR_ESPERABA_COMILLA_CIERRE = 507,            // Error en declaracion char, se esperaba comilla de cierre '
+    ERROR_IDENTIFICADOR_GUION_INVALIDO = 508             // Identificador inválido: __ consecutivos o termina en _
 };
 
 /**

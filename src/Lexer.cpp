@@ -13,115 +13,38 @@
 
 // ========== INICIALIZACIÓN DE DATOS ESTÁTICOS ==========
 
-/**
- * TODO: Llenar la matriz de transición del AFD
- * 
- * Esta matriz define el comportamiento del autómata.
- * Ver docs/matriz_transicion.md para la plantilla completa.
- * Ver docs/AFD_LIA.md para la descripción del autómata.
- * 
- * Ejemplo de cómo llenar una fila:
- * Estado 0 (inicial):
- * {1, 1, 3, 500, 500, 1, 1, 105, 106, 107, 108, 128, 9, 11, 12, 13, 14, 18, 119, 120, 121, 122, 129, 130, 123, 124, 131, 15, 17, 19, 0, 0, 0, 500}
- * 
- * Donde cada posición corresponde a:
- * [0]=L, [1]=l, [2]=d, [3]=_, [4]=., [5]=E, [6]=e, [7]=+, [8]=-, [9]=*, [10]=/,
- * [11]=%, [12]==, [13]=<, [14]=>, [15]=!, [16]=&, [17]=|, [18]=(, [19]=),
- * [20]=[, [21]=], [22]={, [23]=}, [24]=;, [25]=,, [26]=:, [27]=', [28]=",
- * [29]=$, [30]=\t, [31]=\n, [32]=espacio, [33]=otro
- */
 const int Lexer::MATRIZ_TRANSICION[NUM_ESTADOS][NUM_COLUMNAS] = {
-    // Índices de columnas:
-    //  0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
-    //  L    l    d    _    .    E    e    +    -    *    /    %    =    <    >    !    &    |    (    )    [    ]    {    }    ;    ,    :    '    "    $   \t   \n   sp  otro
-    
-    // Estado 0: Estado inicial - Basado en el diagrama del PDF página 4
-    {   1,   1,   3, 500, 500,   1,   1, 105, 106, 107, 108, 128,   9,  11,  12,  13,  14,  18, 119, 120, 121, 122, 129, 130, 123, 124, 131,  15,  17,  19,   0,   0,   0, 500},
-    
-    // Estado 1: Identificador/palabra reservada (acumula L|l|d)
-    // Transiciones: L|l|d → 1 (loop), _ → 2, dif → 100
-    {   1,   1,   1,   2, 100,   1,   1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100},
-    
-    // Estado 2: Después de guión bajo en identificador
-    // Transiciones: L|l|d → 1, _ → 508 (error: __ consecutivos), dif → 101
-    {   1,   1,   1, 508, 101,   1,   1, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101},
-    
-    // Estado 3: Número entero (acumula dígitos)
-    // Transiciones: d → 3 (loop), . → 4, dif → 102 (entero)
-    { 102, 102,   3, 102,   4, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102},
-    
-    // Estado 4: Después del punto decimal (esperando dígitos)
-    // Transiciones: d → 5, otro → 501 (error: esperaba dígitos después del punto)
-    { 501, 501,   5, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501},
-    
-    // Estado 5: Número flotante (acumula dígitos después del punto)
-    // Transiciones: d → 5 (loop), E|e → 6, dif → 103 (flotante)
-    { 103, 103,   5, 103, 103,   6,   6, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103},
-    
-    // Estado 6: Después de E/e en notación científica
-    // Transiciones: +|- → 7, d → 8, otro → 502 (error: esperaba +, - o dígito)
-    { 502, 502,   8, 502, 502, 502, 502,   7,   7, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502},
-    
-    // Estado 7: Después de signo en exponente (esperando dígito)
-    // Transiciones: d → 8, otro → 503 (error: esperaba dígito en exponente)
-    { 503, 503,   8, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503},
-    
-    // Estado 8: Exponente de notación científica (acumula dígitos)
-    // Transiciones: d → 8 (loop), dif → 104 (notación científica)
-    { 104, 104,   8, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104},
-    
-    // Estado 9: Después de = (puede ser = o ==)
-    // Transiciones: = → 110 (==), dif → 109 (=)
-    { 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 110, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109},
-    
-    // Estado 10: Después de / (puede ser división o inicio de comentario - NO USADO en este diseño)
-    // El comentario usa $ según el PDF, no //
-    { 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500},
-    
-    // Estado 11: Después de < (puede ser < o <=)
-    // Transiciones: = → 112 (<=), dif → 111 (<)
-    { 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 112, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111},
-    
-    // Estado 12: Después de > (puede ser > o >=)
-    // Transiciones: = → 113 (>=), dif → 114 (>)
-    { 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 113, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114},
-    
-    // Estado 13: Después de ! (puede ser ! o !=)
-    // Transiciones: = → 115 (!=), dif → 116 (!)
-    { 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 115, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116},
-    
-    // Estado 14: Después de & (esperando segundo &)
-    // Transiciones: & → 117 (&&), dif → 504 (error: esperaba &&)
-    { 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 117, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504},
-    
-    // Estado 15: Después de comilla simple ' (esperando carácter)
-    // Transiciones: cualquier_char → 16, ' → 505 (error: vacío)
-    {  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16, 505,  16,  16,  16,  16,  16,  16},
-    
-    // Estado 16: Carácter dentro de comillas simples (esperando comilla de cierre)
-    // Transiciones: ' → 125 (constante carácter), otro → 505 (error: sin cerrar)
-    { 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 505, 125, 505, 505, 505, 505, 505, 505},
-    
-    // Estado 17: Dentro de string " (acumula hasta encontrar ")
-    // Transiciones: cualquier_char → 17 (loop), " → 126 (string), \n → 507 (error: sin cerrar)
-    {  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17, 126,  17,  17, 507,  17,  17},
-    
-    // Estado 18: Después de | (esperando segundo |)
-    // Transiciones: | → 118 (||), dif → 509 (error: esperaba ||)
-    { 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 118, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509, 509},
-    
-    // Estado 19: Dentro de comentario $ (acumula hasta encontrar \n)
-    // Transiciones: cualquier_char → 19 (loop), \n → 127 (comentario completo)
-    {  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19, 127,  19,  19}
+// MATRIZ DE TRANSICIONES LIA (20 Estados x 34 Columnas)
+// ==============================================================================================================================================
+// Col:     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
+// Char:  | l  | L  | d  | _  | .  | E  | e  | +  | -  | *  | /  | %  | &  | =  | !  | >  | <  | '  | "  | $  | [  | ]  | (  | )  | |  | {  | }  | ,  | :  | ;  |dif | \t | \n | \b |
+// ==============================================================================================================================================
+//      | l  | L  | d  | _  | .  | E  | e  | +  | -  | *  | /  | %  | &  | =  | !  | >  | <  | '  | "  | $  | [  | ]  | (  | )  | |  | {  | }  | ,  | :  | ;  |dif | \t | \n | \b |
+/*q0*/  {  1,   2,   3, 506, 506,   2,   1, 105, 106, 107, 108, 128,  13,   9,  12,  11,  10,  15,  17,  19, 121, 122, 119, 120,  14, 129, 130, 124, 131, 123, 506,   0,   0,   0},
+/*q1*/  {  1,   2,   2,   2, 100,   2,   1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100},
+/*q2*/  {  2,   2,   2,   2, 101,   2,   2, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101},
+/*q3*/  {102, 102,   3, 102,   4, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102},
+/*q4*/  {500, 500,   5, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500},
+/*q5*/  {103, 103,   5, 103, 103,   6,   6, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103},
+/*q6*/  {501, 501,   8, 501, 501, 501, 501,   7,   7, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501},
+/*q7*/  {502, 502,   8, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502},
+/*q8*/  {104, 104,   8, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104},
+/*q9*/  {109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 110, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109},
+/*q10*/ {111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 112, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111},
+/*q11*/ {113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 114, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113},
+/*q12*/ {116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 115, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116, 116},
+/*q13*/ {503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 117, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503},
+/*q14*/ {504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 118, 504, 504, 504, 504, 504, 504, 504, 504, 504},
+/*q15*/ { 16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16, 505,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16},
+/*q16*/ {507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 125, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507},
+/*q17*/ { 17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  18,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17},
+/*q18*/ {126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126,  17, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126},
+/*q19*/ { 19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19, 127,  19}
 };
 
-/**
- * TODO: Llenar la tabla de palabras reservadas
- * 
- * Agregar las 17 palabras reservadas del lenguaje LIA:
- * class, endclass, int, float, char, string, bool,
- * if, else, do, while, input, output, def, to, break, loop
- */
+
+// La tabla de palabras reservadas  
+
 const std::map<std::string, int> Lexer::PALABRAS_RESERVADAS = {
     {"class", 100},
     {"endclass", 100},
@@ -281,28 +204,29 @@ void Lexer::Analiza() {
 // ========== FUNCIONES AUXILIARES DEL ANÁLISIS ==========
 
 int Lexer::relaciona(char c) {
-    // Letras mayúsculas (A-Z)
-    if (c >= 'A' && c <= 'Z') {
-        if (c == 'E') {
-            return COL_E_MAY;  // 5 - E mayúscula (para notación científica)
-        }
-        return COL_L;  // 0 - Letras mayúsculas
-    }
-    
-    // Letras minúsculas (a-z)
+    // Letras minúsculas (a-z) - COL 0
     if (c >= 'a' && c <= 'z') {
         if (c == 'e') {
             return COL_e_MIN;  // 6 - e minúscula (para notación científica)
         }
-        return COL_l;  // 1 - Letras minúsculas
+        return COL_l;  // 0 - Letras minúsculas
     }
     
-    // Dígitos (0-9)
+    // Letras mayúsculas (A-Z) - COL 1
+    if (c >= 'A' && c <= 'Z') {
+        if (c == 'E') {
+            return COL_E_MAY;  // 5 - E mayúscula (para notación científica)
+        }
+        return COL_L;  // 1 - Letras mayúsculas
+    }
+    
+    // Dígitos (0-9) - COL 2
     if (c >= '0' && c <= '9') {
         return COL_d;  // 2 - Dígitos
     }
     
     // Caracteres especiales individuales
+    // Orden según la matriz: l, L, d, _, ., E, e, +, -, *, /, %, &, =, !, >, <, ', ", $, [, ], (, ), |, {, }, ,, :, ;, dif, \t, \n, \b
     switch (c) {
         case '_':  return COL_GUION;      // 3
         case '.':  return COL_PUNTO;      // 4
@@ -311,30 +235,30 @@ int Lexer::relaciona(char c) {
         case '*':  return COL_MULT;       // 9
         case '/':  return COL_DIV;        // 10
         case '%':  return COL_MOD;        // 11
-        case '=':  return COL_IGUAL;      // 12
-        case '<':  return COL_MENOR;      // 13
-        case '>':  return COL_MAYOR;      // 14
-        case '!':  return COL_EXCL;       // 15
-        case '&':  return COL_AMP;        // 16
-        case '|':  return COL_PIPE;       // 17
-        case '(':  return COL_PAREN_A;    // 18
-        case ')':  return COL_PAREN_C;    // 19
+        case '&':  return COL_AMP;        // 12
+        case '=':  return COL_IGUAL;      // 13
+        case '!':  return COL_EXCL;       // 14
+        case '>':  return COL_MAYOR;      // 15
+        case '<':  return COL_MENOR;      // 16
+        case '\'': return COL_COMILLA_S;  // 17
+        case '"':  return COL_COMILLA_D;  // 18
+        case '$':  return COL_DOLAR;      // 19
         case '[':  return COL_CORCH_A;    // 20
         case ']':  return COL_CORCH_C;    // 21
-        case '{':  return COL_LLAVE_A;    // 22
-        case '}':  return COL_LLAVE_C;    // 23
-        case ';':  return COL_PCOMA;      // 24
-        case ',':  return COL_COMA;       // 25
-        case ':':  return COL_DPUNTOS;    // 26
-        case '\'': return COL_COMILLA_S;  // 27
-        case '"':  return COL_COMILLA_D;  // 28
-        case '$':  return COL_DOLAR;      // 29
-        case '\t': return COL_TAB;        // 30
-        case '\n': return COL_NEWLINE;    // 31
-        case ' ':  return COL_ESPACIO;    // 32
+        case '(':  return COL_PAREN_A;    // 22
+        case ')':  return COL_PAREN_C;    // 23
+        case '|':  return COL_PIPE;       // 24
+        case '{':  return COL_LLAVE_A;    // 25
+        case '}':  return COL_LLAVE_C;    // 26
+        case ',':  return COL_COMA;       // 27
+        case ':':  return COL_DPUNTOS;    // 28
+        case ';':  return COL_PCOMA;      // 29
+        case '\t': return COL_TAB;        // 31
+        case '\n': return COL_NEWLINE;    // 32
+        case ' ':  return COL_ESPACIO;    // 33
         
         // Cualquier otro carácter no reconocido
-        default:   return COL_OTRO;       // 33
+        default:   return COL_OTRO;       // 30
     }
 }
 
@@ -517,7 +441,7 @@ bool Lexer::loadFromFile(const std::string& filename) {
     }
     
     std::string content((std::istreambuf_iterator<char>(file)),
-                         std::istreambuf_iterator<char>());
+                        std::istreambuf_iterator<char>());
     file.close();
     
     sourceCode = content;

@@ -302,10 +302,10 @@ void MainWindow::actualizarPanelTokens(const std::vector<Token>& tokens) {
     QString texto;
     for (const Token& token : tokens) {
         texto += QString("Línea %1, Col %2: %3 [%4]\n")
-                 .arg(token.linea)
-                 .arg(token.columna)
-                 .arg(QString::fromStdString(token.lexema))
-                 .arg(QString::fromStdString(token.getGramemaName()));
+                .arg(token.linea)
+                .arg(token.columna)
+                .arg(QString::fromStdString(token.lexema))
+                .arg(QString::fromStdString(token.getGramemaName()));
     }
     
     // Establecer texto en el panel

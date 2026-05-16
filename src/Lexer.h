@@ -31,10 +31,13 @@ const int NUM_COLUMNAS = 34;   // Número de columnas (conjuntos de caracteres)
  * @brief Índices de columnas en la matriz de transición
  * 
  * Cada columna representa un conjunto de caracteres o un carácter específico
+ * IMPORTANTE: El orden debe coincidir con la matriz de transición en Lexer.cpp
+ * 
+ * Orden de la matriz: l, L, d, _, ., E, e, +, -, *, /, %, &, =, !, >, <, ', ", $, [, ], (, ), |, {, }, ,, :, ;, dif, \t, \n, \b
  */
 enum ColumnaMatriz {
-    COL_L = 0,          // Letras mayúsculas A-Z (excepto E)
-    COL_l = 1,          // Letras minúsculas a-z (excepto e)
+    COL_l = 0,          // Letras minúsculas a-z (excepto e)
+    COL_L = 1,          // Letras mayúsculas A-Z (excepto E)
     COL_d = 2,          // Dígitos 0-9
     COL_GUION = 3,      // Guión bajo _
     COL_PUNTO = 4,      // Punto .
@@ -45,28 +48,28 @@ enum ColumnaMatriz {
     COL_MULT = 9,       // *
     COL_DIV = 10,       // /
     COL_MOD = 11,       // %
-    COL_IGUAL = 12,     // =
-    COL_MENOR = 13,     // <
-    COL_MAYOR = 14,     // >
-    COL_EXCL = 15,      // !
-    COL_AMP = 16,       // &
-    COL_PIPE = 17,      // |
-    COL_PAREN_A = 18,   // (
-    COL_PAREN_C = 19,   // )
+    COL_AMP = 12,       // &
+    COL_IGUAL = 13,     // =
+    COL_EXCL = 14,      // !
+    COL_MAYOR = 15,     // >
+    COL_MENOR = 16,     // <
+    COL_COMILLA_S = 17, // '
+    COL_COMILLA_D = 18, // "
+    COL_DOLAR = 19,     // $
     COL_CORCH_A = 20,   // [
     COL_CORCH_C = 21,   // ]
-    COL_LLAVE_A = 22,   // {
-    COL_LLAVE_C = 23,   // }
-    COL_PCOMA = 24,     // ;
-    COL_COMA = 25,      // ,
-    COL_DPUNTOS = 26,   // :
-    COL_COMILLA_S = 27, // '
-    COL_COMILLA_D = 28, // "
-    COL_DOLAR = 29,     // $
-    COL_TAB = 30,       // \t
-    COL_NEWLINE = 31,   // \n
-    COL_ESPACIO = 32,   // espacio
-    COL_OTRO = 33       // cualquier otro carácter
+    COL_PAREN_A = 22,   // (
+    COL_PAREN_C = 23,   // )
+    COL_PIPE = 24,      // |
+    COL_LLAVE_A = 25,   // {
+    COL_LLAVE_C = 26,   // }
+    COL_COMA = 27,      // ,
+    COL_DPUNTOS = 28,   // :
+    COL_PCOMA = 29,     // ;
+    COL_OTRO = 30,      // cualquier otro carácter (dif)
+    COL_TAB = 31,       // \t
+    COL_NEWLINE = 32,   // \n
+    COL_ESPACIO = 33    // espacio (\b en la matriz)
 };
 
 /**
