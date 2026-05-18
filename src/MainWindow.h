@@ -10,34 +10,6 @@
 #include <QString>
 #include "Lexer.h"
 
-/**
- * @file MainWindow.h
- * @brief Ventana principal de la aplicación del analizador léxico LIA
- * 
- * Esta clase implementa la interfaz gráfica usando Qt Widgets.
- * 
- * Layout:
- * ┌─────────────────────────────────────────────────────────┐
- * │  [Panel Izquierdo]         [Panel Derecho]              │
- * │  ┌──────────────────┐      ┌──────────────────┐        │
- * │  │                  │      │ Tokens           │        │
- * │  │  Editor de       │      │ ┌──────────────┐ │        │
- * │  │  Código          │      │ │              │ │        │
- * │  │  (QTextEdit)     │      │ │              │ │        │
- * │  │                  │      │ └──────────────┘ │        │
- * │  │                  │      │                  │        │
- * │  │                  │      │ Sintaxis         │        │
- * │  │                  │      │ ┌──────────────┐ │        │
- * │  │                  │      │ │              │ │        │
- * │  └──────────────────┘      │ └──────────────┘ │        │
- * │  [Abrir] [Guardar]         │                  │        │
- * │  [Limpiar] [Analizar]      │ Errores          │        │
- * │  [Salir]                   │ ┌──────────────┐ │        │
- * │                             │ │              │ │        │
- * │                             │ └──────────────┘ │        │
- * └─────────────────────────────────────────────────────────┘
- */
-
 class MainWindow : public QMainWindow {
     Q_OBJECT
     
