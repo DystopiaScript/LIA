@@ -1,0 +1,36 @@
+$ Ejemplo 3: Archivo con errores léxicos intencionales
+$ Este archivo contiene errores para probar el manejo de errores del lexer
+
+$ Error 1: Identificador inválido (termina con _)
+int variable_;
+
+$ Error 2: Identificador inválido (dos guiones bajos consecutivos)
+int mi__variable;
+
+$ Error 3: Carácter no reconocido
+int x @ 5;
+
+$ Error 4: Constante flotante incompleta
+float pi = 3.;
+
+$ Error 5: Operador AND incompleto
+bool resultado = true & false;
+
+$ Error 6: Operador OR incompleto
+bool otro = false | true;
+
+$ Error 7: Constante de carácter sin cerrar
+char c = 'A;
+
+$ Error 8: Constante de string sin cerrar
+string s = "Hola mundo;
+
+$ Error 9: Notación científica incorrecta
+float cientifico = 1.5E;
+
+$ Código válido después de errores
+int valido;
+valido = 100;
+output valido;
+
+$ Fin del archivo con errores
