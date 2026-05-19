@@ -1,17 +1,8 @@
-/**
- * @file Lexer.cpp
- * @brief Implementación del analizador léxico LIA
- * 
- * Este archivo contiene la implementación del motor del lexer.
- * IMPORTANTE: Este es un ESQUELETO - las funciones están vacías con comentarios TODO
- * que explican qué debe implementarse en cada una.
- */
-
 #include "Lexer.h"
 #include <fstream>
 #include <cctype>
 
-// ========== INICIALIZACIÓN DE DATOS ESTÁTICOS ==========
+// INICIALIZACIÓN DE DATOS ESTÁTICOS
 
 const int Lexer::MATRIZ_TRANSICION[NUM_ESTADOS][NUM_COLUMNAS] = {
 // MATRIZ DE TRANSICIONES LIA (20 Estados x 34 Columnas)
@@ -105,7 +96,7 @@ void Lexer::Analiza() {
         
         // Analizar el siguiente estado
         if (nextState >= 100 && nextState < 200) {
-            // ===== ESTADO DE ACEPTACIÓN =====
+            // ESTADO DE ACEPTACIÓN 
             
             // Algunos tokens necesitan incluir el carácter actual
             bool incluirCaracter = false;
@@ -158,7 +149,7 @@ void Lexer::Analiza() {
             // El siguiente ciclo procesará este carácter desde estado 0
             
         } else if (nextState >= 500) {
-            // ===== ESTADO DE ERROR =====
+            // ESTADO DE ERROR
             
             // Reportar el error
             addError(nextState, c);
@@ -171,7 +162,7 @@ void Lexer::Analiza() {
             currentState = 0;
             
         } else if (nextState == 0) {
-            // ===== WHITESPACE O RETORNO A ESTADO INICIAL =====
+            // WHITESPACE O RETORNO A ESTADO INICIAL 
             
             // Si estamos en estado 0 y vamos a estado 0, es whitespace
             if (currentState == 0) {
@@ -182,7 +173,7 @@ void Lexer::Analiza() {
             }
             
         } else {
-            // ===== ESTADO DE TRANSICIÓN (1-99) =====
+            // ESTADO DE TRANSICIÓN (1-99) 
             
             // Acumular carácter en el buffer
             lexemeBuffer += c;
@@ -201,7 +192,7 @@ void Lexer::Analiza() {
     }
 }
 
-// ========== FUNCIONES AUXILIARES DEL ANÁLISIS ==========
+// FUNCIONES AUXILIARES DEL ANÁLISIS
 
 int Lexer::relaciona(char c) {
     // Letras minúsculas (a-z) - COL 0
@@ -412,19 +403,6 @@ void Lexer::setSourceCode(const std::string& source) {
 }
 
 void Lexer::reset() {
-    /**
-     * TODO: Implementar reinicio del lexer
-     * 
-     * Limpiar todo el estado para un nuevo análisis:
-     * - currentPos = 0
-     * - currentLine = 1
-     * - currentColumn = 1
-     * - currentState = 0
-     * - lexemeBuffer.clear()
-     * - tokens.clear()
-     * - errors.clear()
-     */
-    
     currentPos = 0;
     currentLine = 1;
     currentColumn = 1;

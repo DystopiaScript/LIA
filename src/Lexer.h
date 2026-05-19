@@ -8,9 +8,6 @@
 #include "Error.h"
 
 /**
- * @file Lexer.h
- * @brief Definición de la clase Lexer - Motor del analizador léxico
- * 
  * El Lexer implementa un Autómata Finito Determinístico (AFD) que reconoce
  * los elementos léxicos del lenguaje LIA mediante una matriz de transición.
  * 
@@ -27,9 +24,6 @@ const int NUM_ESTADOS = 20;    // Número de estados del AFD (ajustar según nec
 const int NUM_COLUMNAS = 34;   // Número de columnas (conjuntos de caracteres)
 
 /**
- * @enum ColumnaMatriz
- * @brief Índices de columnas en la matriz de transición
- * 
  * Cada columna representa un conjunto de caracteres o un carácter específico
  * IMPORTANTE: El orden debe coincidir con la matriz de transición en Lexer.cpp
  * 
@@ -78,17 +72,17 @@ enum ColumnaMatriz {
  */
 class Lexer {
 private:
-    // ========== DATOS DEL CÓDIGO FUENTE ==========
+    // DATOS DEL CÓDIGO FUENTE 
     std::string sourceCode;           // Código fuente a analizar
     size_t currentPos;                // Posición actual en el código (índice)
     int currentLine;                  // Línea actual (inicia en 1)
     int currentColumn;                // Columna actual (inicia en 1)
     
-    // ========== ESTADO DEL AFD ==========
+    // ESTADO DEL AFD 
     int currentState;                 // Estado actual del autómata
     std::string lexemeBuffer;         // Buffer para acumular el lexema actual
     
-    // ========== RESULTADOS ==========
+    // RESULTADOS 
     std::vector<Token> tokens;        // Lista de tokens reconocidos
     std::vector<Error> errors;        // Lista de errores encontrados
     

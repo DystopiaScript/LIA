@@ -10,51 +10,29 @@
 #include <QString>
 #include "Lexer.h"
 
-/**
- * @file MainWindow.h
- * @brief Ventana principal de la aplicación del analizador léxico LIA
- * 
- * Esta clase implementa la interfaz gráfica usando Qt Widgets.
- * 
- * Layout:
- * ┌─────────────────────────────────────────────────────────┐
- * │  [Panel Izquierdo]         [Panel Derecho]              │
- * │  ┌──────────────────┐      ┌──────────────────┐        │
- * │  │                  │      │ Tokens           │        │
- * │  │  Editor de       │      │ ┌──────────────┐ │        │
- * │  │  Código          │      │ │              │ │        │
- * │  │  (QTextEdit)     │      │ │              │ │        │
- * │  │                  │      │ └──────────────┘ │        │
- * │  │                  │      │                  │        │
- * │  │                  │      │ Sintaxis         │        │
- * │  │                  │      │ ┌──────────────┐ │        │
- * │  │                  │      │ │              │ │        │
- * │  └──────────────────┘      │ └──────────────┘ │        │
- * │  [Abrir] [Guardar]         │                  │        │
- * │  [Limpiar] [Analizar]      │ Errores          │        │
- * │  [Salir]                   │ ┌──────────────┐ │        │
- * │                             │ │              │ │        │
- * │                             │ └──────────────┘ │        │
- * └─────────────────────────────────────────────────────────┘
- */
+
 
 class MainWindow : public QMainWindow {
+     /**Q_Objet: Avisar al compilador que esta clase tendra eventos y slots de Qt 
+     (slot es una función que se ejecuta en respuesta a una señal, como un clic de botón)
+     */
     Q_OBJECT
-    
 private:
-    // ========== WIDGETS PRINCIPALES ==========
+    // WIDGETS PRINCIPALES
     
     /**
      * Editor de código fuente (panel izquierdo superior)
      * Aquí el usuario escribe o carga el código .lia a analizar
      */
+
     QTextEdit* editorTexto;
     
     /**
      * Panel de tokens reconocidos (panel derecho superior)
      * Muestra la lista de tokens generados por el análisis
-     * Formato: "Línea X: lexema [GRAMEMA]"
+     * Formato: "Línea X: e lexema [GRAMEMA]"
      */
+
     QTextEdit* panelTokens;
     
     /**
@@ -62,6 +40,7 @@ private:
      * Muestra estadísticas y análisis del código
      * TODO: Contenido pendiente de definir con el profesor
      */
+
     QTextEdit* panelSintaxis;
     
     /**
@@ -69,6 +48,7 @@ private:
      * Muestra los errores encontrados durante el análisis
      * Formato: "Error en línea X, columna Y: descripción"
      */
+
     QTextEdit* panelErrores;
     
     // ========== BOTONES DE CONTROL ==========
@@ -85,10 +65,11 @@ private:
      * Motor del analizador léxico
      * Realiza el análisis del código y genera tokens/errores
      */
+    
     Lexer* lexer;
     
-    // ========== ESTADO DE LA APLICACIÓN ==========
-    
+    // ESTADO DE LA APLICACIÓN 
+                                //Qstring es la clase de Qt para manejar texto (similar a std::string pero con soporte Unicode y otras funcionalidades)
     QString archivoActual;      // Ruta del archivo actualmente abierto
     bool modificado;            // Indica si el texto ha sido modificado
     
