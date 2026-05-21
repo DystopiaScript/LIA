@@ -1,0 +1,114 @@
+# ========================================
+# Archivos de compilación y build
+# ========================================
+
+# Directorio de build completo (CMake)
+build/
+bin/
+
+# Archivos objeto
+*.o
+*.obj
+
+# Archivos de enlazado
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# ========================================
+# Archivos generados por Qt
+# ========================================
+
+# MOC (Meta-Object Compiler)
+moc_*.cpp
+moc_*.h
+*_moc.cpp
+
+# UIC (User Interface Compiler)
+ui_*.h
+
+# RCC (Resource Compiler)
+qrc_*.cpp
+
+# Archivos de Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.autosave
+
+# Qt MOC/UIC/RCC generados
+*_autogen/
+
+# ========================================
+# Archivos de CMake
+# ========================================
+
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# ========================================
+# Archivos de IDEs
+# ========================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+
+# Qt Creator
+*.pro.user*
+
+# CLion
+.idea/
+cmake-build-*/
+
+# ========================================
+# Archivos del sistema operativo
+# ========================================
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+# ========================================
+# Archivos temporales
+# ========================================
+
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+*~
+
+# ========================================
+# Archivos de respaldo
+# ========================================
+
+*.bak
+*.backup
+*.old

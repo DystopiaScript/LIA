@@ -10,11 +10,9 @@
 /**
  * @file MainWindow.cpp
  * @brief Implementación de la ventana principal
- * 
- * IMPORTANTE: Este es un ESQUELETO - las funciones están vacías con comentarios TODO
  */
 
-// ========== CONSTRUCTOR Y DESTRUCTOR ==========
+// CONSTRUCTOR Y DESTRUCTOR
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), lexer(nullptr), archivoActual(""), modificado(false) {
@@ -37,11 +35,11 @@ MainWindow::~MainWindow() {
     }
 }
 
-// ========== CONFIGURACIÓN DE LA INTERFAZ ==========
+// CONFIGURACIÓN DE LA INTERFAZ
 
 void MainWindow::setupUI() {
     // Widget central
-    QWidget* centralWidget = new QWidget(this);
+    QWidget* centralWidget = new QWidget(this); 
     setCentralWidget(centralWidget);
     
     // Layout principal horizontal
@@ -139,9 +137,9 @@ void MainWindow::onAbrirArchivo() {
     // Mostrar diálogo de archivo
     QString filename = QFileDialog::getOpenFileName(
         this,
-        "Abrir archivo LIA",
-        "",
-        "Archivos LIA (*.lia);;Todos los archivos (*.*)"
+        "Abrir archivo LIA", // Título del diálogo
+        "", // Directorio inicial (vacío para usar el último)
+        "Archivos LIA (*.lia)" // Filtros de archivos 
     );
     
     // Si el usuario canceló, retornar
@@ -157,8 +155,8 @@ void MainWindow::onAbrirArchivo() {
     }
     
     // Leer contenido
-    QTextStream in(&file);
-    QString contenido = in.readAll();
+    QTextStream in(&file); // QTextStream es una clase de Qt para leer/escribir texto de archivos o strings
+    QString contenido = in.readAll(); // Lee todo el contenido del archivo como un QString
     file.close();
     
     // Cargar en editor
@@ -182,7 +180,7 @@ void MainWindow::onGuardarArchivo() {
             this,
             "Guardar archivo LIA",
             "",
-            "Archivos LIA (*.lia);;Todos los archivos (*.*)"
+            "Archivos LIA (*.lia)"
         );
     }
     
@@ -199,8 +197,8 @@ void MainWindow::onGuardarArchivo() {
     }
     
     // Escribir contenido
-    QTextStream out(&file);
-    out << editorTexto->toPlainText();
+    QTextStream out(&file); //out es un QTextStream para escribir texto en el archivo )
+    out << editorTexto->toPlainText(); //toPlainText() obtiene el texto sin formato del editor
     file.close();
     
     // Actualizar estado
@@ -279,14 +277,14 @@ void MainWindow::onTextoModificado() {
     // Actualizar título de ventana con asterisco
     QString titulo = "Analizador Léxico LIA";
     if (!archivoActual.isEmpty()) {
-        titulo += " - *" + QFileInfo(archivoActual).fileName();
+        titulo += " - *" + QFileInfo(archivoActual).fileName(); 
     } else {
         titulo = "*" + titulo;
     }
     setWindowTitle(titulo);
 }
 
-// ========== FUNCIONES DE ACTUALIZACIÓN DE PANELES ==========
+// FUNCIONES DE ACTUALIZACIÓN DE PANELES 
 
 void MainWindow::actualizarPanelTokens(const std::vector<Token>& tokens) {
     // Limpiar panel
@@ -300,12 +298,12 @@ void MainWindow::actualizarPanelTokens(const std::vector<Token>& tokens) {
     
     // Construir texto con todos los tokens
     QString texto;
-    for (const Token& token : tokens) {
-        texto += QString("Línea %1, Col %2: %3 [%4]\n")
-                 .arg(token.linea)
-                 .arg(token.columna)
-                 .arg(QString::fromStdString(token.lexema))
-                 .arg(QString::fromStdString(token.getGramemaName()));
+    for (const Token& token : tokens) { //por cada token en la lista de tokens
+        texto += QString("Línea %1, Col %2: %3 [%4]\n")  //+= concatena al texto existente con el nuevo token formateado y 
+                .arg(token.linea)                       // asi se va construyendo el texto completo con todos los tokens
+                .arg(token.columna)                     //formato: "Línea X, Col Y: lexema [GRAMEMA]"
+                .arg(QString::fromStdString(token.lexema))
+                .arg(QString::fromStdString(token.getGramemaName()));
     }
     
     // Establecer texto en el panel
@@ -317,21 +315,21 @@ void MainWindow::actualizarPanelSintaxis(const std::vector<Token>& tokens) {
     panelSintaxis->clear();
     
     // Construir texto con estadísticas
-    QString texto = "Estadísticas del Análisis:\n\n";
-    texto += QString("Total de tokens: %1\n").arg(tokens.size());
+    QString texto = "Estadísticas del Análisis:\n\n"; //texto inicial con título de sección
+    texto += QString("Total de tokens: %1\n").arg(tokens.size()); //agrega línea con total de tokens al texto   
     
     // Contar tipos de tokens
-    std::map<std::string, int> contadores;
-    for (const Token& token : tokens) {
-        contadores[token.getGramemaName()]++;
+    std::map<std::string, int> contadores; // mapa para contar cantidad de tokens por gramema (clave: nombre del gramema, valor: cantidad)
+    for (const Token& token : tokens) { //por cada token en la lista de tokens
+        contadores[token.getGramemaName()]++; //incrementa el contador del tipo de token correspondiente al gramema del token actual
     }
     
     // Mostrar distribución de tokens
     texto += "\nDistribución de tokens:\n";
-    for (const auto& par : contadores) {
-        texto += QString("  %1: %2\n")
-                 .arg(QString::fromStdString(par.first))
-                 .arg(par.second);
+    for (const auto& par : contadores) { // por cada par (nombre del gramema, cantidad) en el mapa de contadores
+        texto += QString("  %1: %2\n") // formato: "  NOMBRE_GRAMEMA: CANTIDAD"
+                .arg(QString::fromStdString(par.first)) //par.first es el nombre del gramema (ej: "PALABRA_RESERVADA")
+                .arg(par.second); // par.second es la cantidad de tokens de ese tipo
     }
     
     // Establecer texto en el panel
@@ -344,7 +342,7 @@ void MainWindow::actualizarPanelErrores(const std::vector<Error>& errors) {
     
     // Si no hay errores, mostrar mensaje de éxito
     if (errors.empty()) {
-        panelErrores->setPlainText("✓ Análisis completado sin errores");
+        panelErrores->setPlainText("Análisis completado sin errores");
         return;
     }
     
@@ -352,13 +350,13 @@ void MainWindow::actualizarPanelErrores(const std::vector<Error>& errors) {
     QString texto;
     for (const Error& error : errors) {
         texto += QString("Error en línea %1, columna %2:\n")
-                 .arg(error.linea)
-                 .arg(error.columna);
+                .arg(error.linea)
+                .arg(error.columna);
         texto += QString("  %1\n")
-                 .arg(QString::fromStdString(error.descripcion));
+                .arg(QString::fromStdString(error.descripcion));
         if (!error.caracterProblematico.empty()) {
             texto += QString("  Carácter problemático: '%1'\n\n")
-                     .arg(QString::fromStdString(error.caracterProblematico));
+                    .arg(QString::fromStdString(error.caracterProblematico));
         } else {
             texto += "\n";
         }
@@ -375,7 +373,7 @@ void MainWindow::limpiarPaneles() {
     panelErrores->clear();
 }
 
-// ========== FUNCIONES AUXILIARES ==========
+// FUNCIONES AUXILIARES
 
 bool MainWindow::confirmarCambios() {
     // Si no hay modificaciones, continuar sin preguntar
