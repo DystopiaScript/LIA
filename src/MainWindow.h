@@ -10,8 +10,11 @@
 #include <QString>
 #include "Lexer.h"
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 6c6d254612ecbda89c390db580f4307f8248a311
 class MainWindow : public QMainWindow {
      /**Q_Objet: Avisar al compilador que esta clase tendra eventos y slots de Qt 
      (slot es una función que se ejecuta en respuesta a una señal, como un clic de botón)
