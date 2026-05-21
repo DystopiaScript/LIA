@@ -330,6 +330,7 @@ bool Lexer::isReservedWord(const std::string& lexema) {
     return PALABRAS_RESERVADAS.find(lexema) != PALABRAS_RESERVADAS.end();
 }
 
+
 bool Lexer::isValidIdentifier(const std::string& lexema) {
     // Verificar que no está vacío
     if (lexema.empty()) {

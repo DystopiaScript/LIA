@@ -231,7 +231,7 @@ private:
      * 
      * TODO: Implementar
      * - Si no hay errores, mostrar mensaje de éxito:
-     *   "✓ Análisis completado sin errores"
+     *   "Análisis completado sin errores"
      * - Si hay errores, listar cada uno con formato:
      *   "Error en línea X, columna Y:
      *      Descripción del error
