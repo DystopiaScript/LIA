@@ -241,6 +241,11 @@ void MainWindow::onAnalizar() {
         return;
     }
     
+    // Asegurar newline final para que el lexer cierre el último token
+    if (!texto.endsWith('\n')) {
+        texto.append('\n');
+    }
+
     // Convertir a std::string
     std::string codigo = texto.toStdString();
     
