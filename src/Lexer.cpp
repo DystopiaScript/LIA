@@ -28,7 +28,7 @@ const int Lexer::MATRIZ_TRANSICION[NUM_ESTADOS][NUM_COLUMNAS] = {
 /*q14*/ {504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 504, 118, 504, 504, 504, 504, 504, 504, 504, 504, 504},
 /*q15*/ { 16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16, 505,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16},
 /*q16*/ {507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 125, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507, 507},
-/*q17*/ { 17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  18,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17},
+/*q17*/ { 17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  18,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17,  17, 508,  17},
 /*q18*/ {126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126,  17, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126},
 /*q19*/ { 19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19,  19, 127,  19}
 };
@@ -186,8 +186,24 @@ void Lexer::Analiza() {
         }
     }
     
-    // Al final, verificar si quedó un token pendiente
-    if (!lexemeBuffer.empty() && currentState >= 100 && currentState < 200) {
+    // ========== MANEJO DEL FINAL DEL CÓDIGO FUENTE ==========
+    // El AFD no tiene una transición de error para EOF dentro de un string,
+    // así que detectamos el estado final manualmente.
+
+    if (currentState == 17) {
+        // Estado 17 al EOF: estábamos dentro del string y nunca encontramos
+        // la comilla de cierre → Error 508 (string sin cerrar)
+        addError(ERROR_STRING_SIN_CERRAR, '"');
+        lexemeBuffer.clear();
+        currentState = 0;
+    } else if (currentState == 18) {
+        // Estado 18 al EOF: la última " que leímos sí era de cierre
+        // (no había otra " para duplicarla) → string válido (gramema 126)
+        addToken(lexemeBuffer, 126);
+        lexemeBuffer.clear();
+        currentState = 0;
+    } else if (!lexemeBuffer.empty() && currentState >= 100 && currentState < 200) {
+        // Token pendiente en estado de aceptación (caso defensivo)
         addToken(lexemeBuffer, currentState);
     }
 }
@@ -257,14 +273,12 @@ void Lexer::addToken(const std::string& lexema, int estadoAceptacion) {
     int gramema = estadoAceptacion;
     
     // Caso especial: estado 100 puede ser palabra reservada o identificador
+    // Nota: el AFD acepta cualquier secuencia de l|L|d|_ como identificador,
+    // por lo que no se valida formato adicional aquí (variable_ y mi__variable son válidos).
     if (estadoAceptacion == 100) {
         if (isReservedWord(lexema)) {
             gramema = 100;  // Palabra reservada
         } else {
-            if (!isValidIdentifier(lexema)) {
-                addError(508, lexema.empty() ? '\0' : lexema[lexema.length()-1]);
-                return;
-            }
             gramema = 101;  // Identificador
         }
     }
@@ -332,24 +346,9 @@ bool Lexer::isReservedWord(const std::string& lexema) {
 
 
 bool Lexer::isValidIdentifier(const std::string& lexema) {
-    // Verificar que no está vacío
-    if (lexema.empty()) {
-        return false;
-    }
-    
-    // Verificar que no termina con _
-    if (lexema[lexema.length() - 1] == '_') {
-        return false;
-    }
-    
-    // Verificar que no tiene __ consecutivos
-    for (size_t i = 0; i < lexema.length() - 1; i++) {
-        if (lexema[i] == '_' && lexema[i+1] == '_') {
-            return false;
-        }
-    }
-    
-    return true;
+    // El AFD ya garantiza la forma del identificador (L|l|d|_ en bucle).
+    // Solo verificamos que no esté vacío.
+    return !lexema.empty();
 }
 
 // ========== FUNCIONES DE RECUPERACIÓN DE ERRORES ==========

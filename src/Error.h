@@ -32,7 +32,7 @@ enum CodigoError {
     ERROR_CHAR_DOS_COMILLAS_SIMPLES = 505,               // Dos comillas simples, error al declarar char (vacío)
     ERROR_LEXICO_NO_RECONOCE_LENGUAJE = 506,             // Error lexico, no se reconoce el lenguaje
     ERROR_CHAR_ESPERABA_COMILLA_CIERRE = 507,            // Error en declaracion char, se esperaba comilla de cierre '
-    ERROR_IDENTIFICADOR_GUION_INVALIDO = 508             // Identificador inválido: __ consecutivos o termina en _
+    ERROR_STRING_SIN_CERRAR = 508                        // Constante de string sin cerrar: falta comilla doble de cierre "
 };
 
 /**

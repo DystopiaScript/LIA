@@ -20,11 +20,22 @@ Error::Error(int lin, int col, int codigo, const std::string& car)
 
 // Convierte el error a string para visualización
 std::string Error::toString() const {
-    std::string resultado = "Error en línea " + std::to_string(linea) + 
+    std::string resultado = "Error en línea " + std::to_string(linea) +
                         ", columna " + std::to_string(columna) + ":\n";
     resultado += "   " + descripcion + "\n";
     if (!caracterProblematico.empty()) {
-        resultado += "   Carácter problemático: '" + caracterProblematico + "'";
+        // Escapar caracteres especiales para que no rompan el formato del mensaje
+        std::string carDisplay;
+        for (char c : caracterProblematico) {
+            switch (c) {
+                case '\n': carDisplay += "\\n"; break;
+                case '\t': carDisplay += "\\t"; break;
+                case '\r': carDisplay += "\\r"; break;
+                case '\0': carDisplay += "EOF"; break;
+                default:   carDisplay += c;     break;
+            }
+        }
+        resultado += "   Carácter problemático: '" + carDisplay + "'";
     }
     return resultado;
 }
@@ -56,8 +67,8 @@ std::string Error::getDescripcionError(int codigoError) {
         case ERROR_CHAR_ESPERABA_COMILLA_CIERRE:
             return "Constante de carácter sin cerrar: falta comilla simple de cierre '";
         
-        case ERROR_IDENTIFICADOR_GUION_INVALIDO:
-            return "Identificador inválido: no puede tener __ consecutivos ni terminar en _";
+        case ERROR_STRING_SIN_CERRAR:
+            return "Constante de string sin cerrar: falta comilla doble de cierre \"";
         
         default:
             return "Error léxico desconocido (código: " + std::to_string(codigoError) + ")";
