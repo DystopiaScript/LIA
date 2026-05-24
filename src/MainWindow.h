@@ -75,14 +75,14 @@ public:
      * @brief Constructor de la ventana principal
      * @param parent Widget padre (nullptr para ventana independiente)
      */
-    MainWindow(QWidget* parent = nullptr);
+    MainWindow(QWidget* parent = nullptr); 
     
     /**
      * @brief Destructor
      */
     ~MainWindow();
     
-private slots:
+private slots: 
     /**
      * @brief Slot: Abrir archivo .lia
      * 
