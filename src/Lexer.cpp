@@ -111,7 +111,7 @@ void Lexer::Analiza() {
             }
             
             // Operadores de dos caracteres
-            if (nextState == 110 || nextState == 112 || nextState == 113 || 
+            if (nextState == 110 || nextState == 112 || nextState == 114 || 
                 nextState == 115 || nextState == 117 || nextState == 118) {
                 incluirCaracter = true;
             }
