@@ -137,7 +137,7 @@ void Lexer::Analiza() {
             
             // Crear el token
             if (!lexemeBuffer.empty()) {
-                addToken(lexemeBuffer, nextState);
+                addToken(lexemeBuffer, nextState); //lexemeBuffer es el texto del token, nextState es el gramema (código de token)
             }
             
             // Limpiar y reiniciar
@@ -158,7 +158,7 @@ void Lexer::Analiza() {
             
             // Limpiar y reiniciar
             lexemeBuffer.clear();
-            currentState = 0;
+            currentState = 0; 
             
         } else if (nextState == 0) {
             // WHITESPACE O RETORNO A ESTADO INICIAL 
@@ -330,7 +330,6 @@ char Lexer::getChar() {
 bool Lexer::isReservedWord(const std::string& lexema) {
     return PALABRAS_RESERVADAS.find(lexema) != PALABRAS_RESERVADAS.end();
 }
-
 
 // ========== FUNCIONES DE RECUPERACIÓN DE ERRORES ==========
 
