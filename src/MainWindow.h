@@ -37,7 +37,7 @@ private:
      * Se mantiene como marcador de posición
      */
 
-    QTextEdit* panelProximamente;
+    QTextEdit* panelSintaxis;
     
     /**
      * Panel de errores léxicos (panel derecho inferior)
@@ -217,7 +217,7 @@ private:
      * 
      * TODO: Implementar
      * - Limpiar panelTokens
-    * - Limpiar panelProximamente
+    * - Limpiar panelSintaxis
      * - Limpiar panelErrores
      */
     void limpiarPaneles();
