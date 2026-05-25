@@ -1,36 +1,34 @@
-$ Ejemplo 3: Archivo con errores léxicos intencionales
-$ Este archivo contiene errores para probar el manejo de errores del lexer
+$ Ejemplo: Archivo con errores léxicos reales del lexer
+$ Cada bloque intenta disparar un código de error definido en Error.h / Lexer.cpp
 
-$ Error 1: Identificador inválido (termina con _)
-int variable_;
-
-$ Error 2: Identificador inválido (dos guiones bajos consecutivos)
-int mi__variable;
-
-$ Error 3: Carácter no reconocido
+$ Error 506: carácter no reconocido por el lenguaje
 int x @ 5;
 
-$ Error 4: Constante flotante incompleta
+$ Error 500: flotante espera dígitos después del punto
 float pi = 3.;
 
-$ Error 5: Operador AND incompleto
-bool resultado = true & false;
+$ Error 501: notación científica espera dígito o signo después de E
+float cientifico1 = 1.5E;
 
-$ Error 6: Operador OR incompleto
-bool otro = false | true;
+$ Error 502: después del signo en notación científica se esperan dígitos
+float cientifico2 = 2E+;
 
-$ Error 7: Constante de carácter sin cerrar
-char c = 'A;
+$ Error 503: operador AND incompleto, falta el segundo &
+bool resultado1 = true & false;
 
-$ Error 8: Constante de string sin cerrar
-string s = "Hola mundo;
+$ Error 504: operador OR incompleto, falta el segundo |
+bool resultado2 = false | true;
 
-$ Error 9: Notación científica incorrecta
-float cientifico = 1.5E;
+$ Error 505: constante de carácter vacía
+char c_vacio = '';
 
-$ Código válido después de errores
+$ Error 507: constante de carácter sin comilla de cierre
+char c_sin_cerrar = 'A;
+
+$ Error 508: constante de string sin cerrar
+string s_sin_cerrar = "Hola mundo;
+
+$ Código válido después de los errores
 int valido;
 valido = 100;
 output valido;
-
-$ Fin del archivo con errores
