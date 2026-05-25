@@ -33,9 +33,8 @@ private:
     QTextEdit* panelTokens;
     
     /**
-     * Panel de información sintáctica (panel derecho medio)
-     * Muestra estadísticas y análisis del código
-     * TODO: Contenido pendiente de definir con el profesor
+     * Panel de información auxiliar (panel derecho medio)
+     * Se mantiene como marcador de posición
      */
 
     QTextEdit* panelSintaxis;
@@ -75,14 +74,14 @@ public:
      * @brief Constructor de la ventana principal
      * @param parent Widget padre (nullptr para ventana independiente)
      */
-    MainWindow(QWidget* parent = nullptr);
+    MainWindow(QWidget* parent = nullptr); 
     
     /**
      * @brief Destructor
      */
     ~MainWindow();
     
-private slots:
+private slots: 
     /**
      * @brief Slot: Abrir archivo .lia
      * 
@@ -199,30 +198,6 @@ private:
     void actualizarPanelTokens(const std::vector<Token>& tokens);
     
     /**
-     * @brief Actualiza el panel de sintaxis con estadísticas
-     * @param tokens Vector de tokens reconocidos
-     * 
-     * TODO: Implementar (contenido pendiente de definir con profesor)
-     * - Mostrar estadísticas básicas:
-     *   * Total de tokens
-     *   * Líneas procesadas
-     *   * Distribución de tipos de tokens
-     * 
-     * Ejemplo:
-     * Estadísticas del Análisis:
-     * 
-     * Total de tokens: 42
-     * Líneas procesadas: 15
-     * 
-     * Distribución de tokens:
-     *   PALABRA_RESERVADA: 8
-     *   IDENTIFICADOR: 12
-     *   CONSTANTE_ENTERA: 5
-     *   ...
-     */
-    void actualizarPanelSintaxis(const std::vector<Token>& tokens);
-    
-    /**
      * @brief Actualiza el panel de errores con los errores encontrados
      * @param errors Vector de errores léxicos
      * 
@@ -242,7 +217,7 @@ private:
      * 
      * TODO: Implementar
      * - Limpiar panelTokens
-     * - Limpiar panelSintaxis
+    * - Limpiar panelSintaxis
      * - Limpiar panelErrores
      */
     void limpiarPaneles();

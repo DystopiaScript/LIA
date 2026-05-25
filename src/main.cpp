@@ -10,9 +10,9 @@ int main(int argc, char *argv[]) {
     app.setOrganizationName("Universidad");
     
     // Crear y mostrar ventana principal
-    MainWindow ventana;
-    ventana.show();
+    MainWindow ventana; // Crear instancia de la ventana principal
+    ventana.show();    // Mostrar la ventana
     
     // Ejecutar el loop de eventos de Qt
-    return app.exec();
+    return app.exec(); // Iniciar la aplicación y esperar eventos (clics, etc.)
 }
