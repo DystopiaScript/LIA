@@ -1,5 +1,4 @@
 #include "Lexer.h"
-#include <fstream>
 #include <cctype>
 
 // INICIALIZACIÓN DE DATOS ESTÁTICOS

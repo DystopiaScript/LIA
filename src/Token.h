@@ -44,8 +44,8 @@ enum Gramema {
     OP_IGUALDAD = 110,           // == 
     OP_MENOR = 111,              // <
     OP_MENOR_IGUAL = 112,        // <=
-    OP_MAYOR = 113,              // > 
-    OP_MAYOR_IGUAL = 114,        // >=  
+    OP_MAYOR_IGUAL = 113,        // >= //estan al reves
+    OP_MAYOR = 114,              // >  //estan al reves
     OP_DIFERENTE = 115,          // !=
     
     // Operadores lógicos
@@ -96,14 +96,6 @@ public:
      * @param col Número de columna
      */
     Token(const std::string& lex, int gram, int lin, int col);
-    
-    /**
-     * @brief Convierte el token a string para visualización
-     * @return String con formato "Línea X: lexema [gramema]"
-     * 
-     * Ejemplo: "Línea 5: int [PALABRA_RESERVADA]"
-     */
-    std::string toString() const;
     
     /**
      * @brief Obtiene el nombre legible del gramema
