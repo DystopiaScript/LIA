@@ -5,8 +5,6 @@
 #include <QTextStream>
 #include <QFont>
 #include <QFileInfo>
-#include <map>
-
 /**
  * @file MainWindow.cpp
  * @brief Implementación de la ventana principal
@@ -85,7 +83,7 @@ void MainWindow::setupUI() {
     panelTokens->setFont(QFont("Courier New", 9));
     layoutDerecho->addWidget(panelTokens);
     
-    // Panel de Sintaxis
+    // Panel auxiliar
     QLabel* labelSintaxis = new QLabel("Sintaxis:");
     labelSintaxis->setStyleSheet("font-weight: bold; font-size: 12pt;");
     layoutDerecho->addWidget(labelSintaxis);
@@ -93,6 +91,7 @@ void MainWindow::setupUI() {
     panelSintaxis = new QTextEdit();
     panelSintaxis->setReadOnly(true);
     panelSintaxis->setFont(QFont("Courier New", 9));
+    panelSintaxis->setPlainText("Proximamente");
     layoutDerecho->addWidget(panelSintaxis);
     
     // Panel de Errores
@@ -261,7 +260,6 @@ void MainWindow::onAnalizar() {
     
     // Actualizar paneles
     actualizarPanelTokens(tokens);
-    actualizarPanelSintaxis(tokens);
     actualizarPanelErrores(errors);
 }
 
@@ -315,32 +313,6 @@ void MainWindow::actualizarPanelTokens(const std::vector<Token>& tokens) {
     panelTokens->setPlainText(texto);
 }
 
-void MainWindow::actualizarPanelSintaxis(const std::vector<Token>& tokens) {
-    // Limpiar panel
-    panelSintaxis->clear();
-    
-    // Construir texto con estadísticas
-    QString texto = "Estadísticas del Análisis:\n\n"; //texto inicial con título de sección
-    texto += QString("Total de tokens: %1\n").arg(tokens.size()); //agrega línea con total de tokens al texto   
-    
-    // Contar tipos de tokens
-    std::map<std::string, int> contadores; // mapa para contar cantidad de tokens por gramema (clave: nombre del gramema, valor: cantidad)
-    for (const Token& token : tokens) { //por cada token en la lista de tokens
-        contadores[token.getGramemaName()]++; //incrementa el contador del tipo de token correspondiente al gramema del token actual
-    }
-    
-    // Mostrar distribución de tokens
-    texto += "\nDistribución de tokens:\n";
-    for (const auto& par : contadores) { // por cada par (nombre del gramema, cantidad) en el mapa de contadores
-        texto += QString("  %1: %2\n") // formato: "NOMBRE_GRAMEMA : CANTIDAD"
-                .arg(QString::fromStdString(par.first)) //par.first es el nombre del gramema (ej: "PALABRA_RESERVADA")
-                .arg(par.second); // par.second es la cantidad de tokens de ese tipo
-    }
-    
-    // Establecer texto en el panel
-    panelSintaxis->setPlainText(texto);
-}
-
 void MainWindow::actualizarPanelErrores(const std::vector<Error>& errors) {
     // Limpiar panel
     panelErrores->clear();
@@ -374,7 +346,7 @@ void MainWindow::actualizarPanelErrores(const std::vector<Error>& errors) {
 void MainWindow::limpiarPaneles() {
     // Limpiar todos los paneles de resultados
     panelTokens->clear();
-    panelSintaxis->clear();
+    panelSintaxis->setPlainText("Proximamente");
     panelErrores->clear();
 }
 
