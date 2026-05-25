@@ -98,14 +98,6 @@ public:
     Token(const std::string& lex, int gram, int lin, int col);
     
     /**
-     * @brief Convierte el token a string para visualización
-     * @return String con formato "Línea X: lexema [gramema]"
-     * 
-     * Ejemplo: "Línea 5: int [PALABRA_RESERVADA]"
-     */
-    std::string toString() const;
-    
-    /**
      * @brief Obtiene el nombre legible del gramema
      * @return Nombre del gramema (ej: "PALABRA_RESERVADA", "IDENTIFICADOR")
      * 

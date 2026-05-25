@@ -1,5 +1,4 @@
 #include "Lexer.h"
-#include <fstream>
 #include <cctype>
 
 // INICIALIZACIÓN DE DATOS ESTÁTICOS
@@ -326,30 +325,12 @@ char Lexer::getChar() {
     return c;
 }
 
-void Lexer::ungetChar() {
-    // Verificar que podemos retroceder
-    if (currentPos > 0) {
-        currentPos--;       // Retroceder posición
-        currentColumn--;    // Retroceder columna
-        
-        // Nota: No ajustamos currentLine porque es complejo
-        // y raramente retrocedemos a través de un \n
-        // Si fuera necesario, tendríamos que buscar hacia atrás
-    }
-}
-
 // ========== FUNCIONES DE VALIDACIÓN ==========
 
 bool Lexer::isReservedWord(const std::string& lexema) {
     return PALABRAS_RESERVADAS.find(lexema) != PALABRAS_RESERVADAS.end();
 }
 
-
-bool Lexer::isValidIdentifier(const std::string& lexema) {
-    // El AFD ya garantiza la forma del identificador (L|l|d|_ en bucle).
-    // Solo verificamos que no esté vacío.
-    return !lexema.empty();
-}
 
 // ========== FUNCIONES DE RECUPERACIÓN DE ERRORES ==========
 
@@ -362,26 +343,6 @@ void Lexer::skipToNextDelimiter() {
             break;
         }
         getChar();  // Consumir y descartar
-    }
-}
-
-void Lexer::skipWhitespace() {
-    while (currentPos < sourceCode.length()) {
-        char c = peekChar();
-        if (c != ' ' && c != '\t' && c != '\n') {
-            break;
-        }
-        getChar();  // Consumir
-    }
-}
-
-void Lexer::skipComment() {
-    // Asumiendo que ya se leyó el $
-    while (currentPos < sourceCode.length()) {
-        char c = getChar();
-        if (c == '\n') {
-            break;
-        }
     }
 }
 
@@ -412,17 +373,3 @@ void Lexer::reset() {
     errors.clear();
 }
 
-bool Lexer::loadFromFile(const std::string& filename) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        return false;
-    }
-    
-    std::string content((std::istreambuf_iterator<char>(file)),
-                        std::istreambuf_iterator<char>());
-    file.close();
-    
-    sourceCode = content;
-    reset();
-    return true;
-}

@@ -215,14 +215,6 @@ public:
      */
     char getChar();
     
-    /**
-     * @brief Retrocede un carácter (backtrack)
-     * 
-     * Usado cuando un token no incluye el último carácter leído
-     * Ejemplo: identificador seguido de operador
-     */
-    void ungetChar();
-    
     // ========== FUNCIONES DE VALIDACIÓN ==========
     /**
      * @brief Verifica si un lexema es palabra reservada
@@ -230,17 +222,6 @@ public:
      * @return true si es palabra reservada, false si no
      */
     bool isReservedWord(const std::string& lexema);
-    
-    /**
-     * @brief Verifica si un identificador es válido
-     * @param lexema Identificador a validar
-     * @return true si es válido, false si no
-     * 
-     * Reglas:
-     * - No puede terminar con _
-     * - No puede tener __ consecutivos
-     */
-    bool isValidIdentifier(const std::string& lexema);
     
     // ========== FUNCIONES DE RECUPERACIÓN DE ERRORES ==========
     /**
@@ -252,21 +233,6 @@ public:
      * - Espacio en blanco: espacio, \t, \n
      */
     void skipToNextDelimiter();
-    
-    /**
-     * @brief Salta espacios en blanco
-     * 
-     * Consume espacios, tabulaciones y nuevas líneas
-     * Actualiza currentLine cuando encuentra \n
-     */
-    void skipWhitespace();
-    
-    /**
-     * @brief Salta un comentario de línea
-     * 
-     * Consume caracteres desde $ hasta \n
-     */
-    void skipComment();
     
     // ========== FUNCIONES DE ACCESO A RESULTADOS ==========
     /**
@@ -295,12 +261,6 @@ public:
      */
     void reset();
     
-    /**
-     * @brief Carga código fuente desde un archivo
-     * @param filename Ruta del archivo .lia
-     * @return true si se cargó exitosamente, false si hubo error
-     */
-    bool loadFromFile(const std::string& filename);
 };
 
 #endif // LEXER_H
