@@ -27,7 +27,6 @@ LIA/
 ├── CMakeLists.txt
 ├── compilar_y_ejecutar.bat
 ├── README.md
-├── build/
 ├── ejemplos/
 │   ├── ejemplo_con_errores.lia
 │   ├── ejemplo1.lia
