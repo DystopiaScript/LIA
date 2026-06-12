@@ -112,3 +112,6 @@ $RECYCLE.BIN/
 *.bak
 *.backup
 *.old
+
+# Configuracion local de Qt Creator (carpeta de proyecto)
+.qtcreator/

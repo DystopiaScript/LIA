@@ -1,0 +1,16 @@
+$ ============================================================
+$ Programa con ERROR SINTACTICO intencional
+$ La declaracion no tiene tipo despues de ':'
+$ El parser debe reportar:
+$   "Se esperaba: int, float, char, bool, string"
+$   "Se encontro: ';'"
+$ (el driver se detiene en el primer error)
+$ ============================================================
+
+class ( ConError ) {
+
+def x : ;
+
+x = 10 ;
+
+}

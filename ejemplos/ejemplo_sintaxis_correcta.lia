@@ -1,0 +1,62 @@
+$ ============================================================
+$ Programa SINTACTICAMENTE CORRECTO para probar el parser LIA
+$ Ejercita todas las construcciones de la gramatica
+$ ============================================================
+
+class ( MiPrograma ) {
+
+$ --- Declaraciones (DECLARA, LID, TIPO) ---
+def x, y : int ;
+def promedio : float ;
+def nombre : string ;
+def inicial : char ;
+def activo : bool ;
+
+$ --- Asignaciones y expresiones (EST_ASIG, EXPR, TERM, FACT) ---
+x = 10 ;
+y = 20 ;
+promedio = ( x + y ) / 2 ;
+promedio = 3.14 ;
+promedio = 1.5E+3 ;
+nombre = "Hola LIA" ;
+inicial = 'A' ;
+activo = x < y && ! ( x == y ) ;
+activo = x >= 1 || y != 0 ;
+
+$ --- If con else (EST_IF, SINO) ---
+$ OJO: en LIA el else va DENTRO de las llaves del if
+$ (segun la gramatica: if ( EXPR ) { ESTATUTOS SINO } )
+if ( promedio >= 15 ) {
+output ( promedio ) ;
+else
+output ( x , y ) ;
+}
+
+$ --- If sin else (SINO deriva a epsilon) ---
+if ( activo ) {
+x = x + 1 ;
+}
+
+$ --- While (EST_WHILE) ---
+while ( x < 100 ) {
+x = x * 2 ;
+}
+
+$ --- Do-dowhile (EST_DO) ---
+do
+y = y - 1 ;
+dowhile ( y > 0 ) ;
+
+$ --- Loop con break (EST_LOOP, EST_BREAK) ---
+loop {
+break ;
+}
+
+$ --- Entrada con lista de expresiones (EST_WRITE, LEXPR) ---
+input ( x ) ;
+input ( x , y + 1 ) ;
+
+$ --- Salida con lista de ids (EST_READ, LIDR) ---
+output ( x , y , promedio ) ;
+
+}

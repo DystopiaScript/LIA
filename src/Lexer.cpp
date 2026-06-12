@@ -50,7 +50,7 @@ const std::map<std::string, int> Lexer::PALABRAS_RESERVADAS = {
     {"input", 100},
     {"output", 100},
     {"def", 100},
-    {"to", 100},
+    {"dowhile", 100},
     {"break", 100},
     {"loop", 100}
 };

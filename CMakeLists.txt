@@ -14,6 +14,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Recoger de forma automática todos los archivos .cpp de tu carpeta src
+# NOTA: GLOB solo se evalúa al CONFIGURAR CMake. Si agregas archivos nuevos
+# a src/ y el linker marca "undefined reference", re-ejecuta CMake:
+# Qt Creator: Build > Run CMake   (o modifica este archivo para forzarlo)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "src/*.h")
 

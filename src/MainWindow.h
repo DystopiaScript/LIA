@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QString>
 #include "Lexer.h"
+#include "Parser.h"
 class MainWindow : public QMainWindow {
      /**Q_Objet: Avisar al compilador que esta clase tendra eventos y slots de Qt 
      (slot es una función que se ejecuta en respuesta a una señal, como un clic de botón)
@@ -33,8 +34,9 @@ private:
     QTextEdit* panelTokens;
     
     /**
-     * Panel de información auxiliar (panel derecho medio)
-     * Se mantiene como marcador de posición
+     * Panel de análisis sintáctico (panel derecho medio)
+     * Muestra el veredicto del parser (sintaxis correcta / errores)
+     * y la pila de ejecución (traza) del método predictivo
      */
 
     QTextEdit* panelSintaxis;
@@ -63,8 +65,15 @@ private:
      */
     
     Lexer* lexer;
-    
-    // ESTADO DE LA APLICACIÓN 
+
+    /**
+     * Motor del analizador sintáctico (método predictivo no recursivo)
+     * Recibe los tokens del lexer y valida la estructura del programa
+     */
+
+    Parser* parser;
+
+    // ESTADO DE LA APLICACIÓN
                                 //Qstring es la clase de Qt para manejar texto (similar a std::string pero con soporte Unicode y otras funcionalidades)
     QString archivoActual;      // Ruta del archivo actualmente abierto
     bool modificado;            // Indica si el texto ha sido modificado
@@ -211,7 +220,16 @@ private:
      * - Usar error.toString() o construir manualmente
      */
     void actualizarPanelErrores(const std::vector<Error>& errors);
-    
+
+    /**
+     * @brief Actualiza el panel de sintaxis con el resultado del parser
+     *
+     * Muestra:
+     * - Veredicto: SINTAXIS CORRECTA o los errores sintácticos encontrados
+     * - La pila de ejecución (traza) del análisis predictivo, paso a paso
+     */
+    void actualizarPanelSintaxis();
+
     /**
      * @brief Limpia todos los paneles de resultados
      * 

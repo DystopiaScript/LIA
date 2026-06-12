@@ -13,14 +13,17 @@
 // CONSTRUCTOR Y DESTRUCTOR
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), lexer(nullptr), archivoActual(""), modificado(false) {
-    
+    : QMainWindow(parent), lexer(nullptr), parser(nullptr), archivoActual(""), modificado(false) {
+
     // Crear instancia del lexer
     lexer = new Lexer();
-    
+
+    // Crear instancia del parser (analizador sintáctico predictivo)
+    parser = new Parser();
+
     // Configurar la interfaz
     setupUI();
-    
+
     // Conectar señales y slots
     setupConnections();
 }
@@ -30,6 +33,11 @@ MainWindow::~MainWindow() {
     if (lexer != nullptr) {
         delete lexer;
         lexer = nullptr;
+    }
+    // Liberar memoria del parser
+    if (parser != nullptr) {
+        delete parser;
+        parser = nullptr;
     }
 }
 
@@ -91,7 +99,7 @@ void MainWindow::setupUI() {
     panelSintaxis = new QTextEdit();
     panelSintaxis->setReadOnly(true);
     panelSintaxis->setFont(QFont("Courier New", 9));
-    panelSintaxis->setPlainText("Proximamente");
+    panelSintaxis->setPlainText("Presiona 'Analizar' para ejecutar el análisis sintáctico");
     layoutDerecho->addWidget(panelSintaxis);
     
     // Panel de Errores
@@ -257,9 +265,27 @@ void MainWindow::onAnalizar() {
     // Obtener resultados
     const std::vector<Token>& tokens = lexer->getTokens();
     const std::vector<Error>& errors = lexer->getErrors();
-    
-    // Actualizar paneles
+
+    // Actualizar panel de tokens
     actualizarPanelTokens(tokens);
+
+    // ===== FASE 2: ANÁLISIS SINTÁCTICO (método predictivo) =====
+    // Solo se ejecuta si el léxico no encontró errores: con errores léxicos
+    // la lista de tokens queda incompleta y el parser daría errores engañosos
+    if (errors.empty()) {
+        parser->setTokens(tokens);
+        parser->Analiza();
+        actualizarPanelSintaxis();
+    } else {
+        // Limpiar resultados de análisis sintácticos anteriores
+        parser->reset();
+        panelSintaxis->setPlainText(
+            "Análisis sintáctico NO ejecutado:\n"
+            "corrige primero los errores léxicos.");
+    }
+
+    // El panel de errores se actualiza AL FINAL para combinar
+    // los errores de ambas fases (léxicos + sintácticos)
     actualizarPanelErrores(errors);
 }
 
@@ -316,28 +342,101 @@ void MainWindow::actualizarPanelTokens(const std::vector<Token>& tokens) {
 void MainWindow::actualizarPanelErrores(const std::vector<Error>& errors) {
     // Limpiar panel
     panelErrores->clear();
-    
-    // Si no hay errores, mostrar mensaje de éxito
-    if (errors.empty()) {
+
+    // Este panel es el RESUMEN UNIFICADO de errores de ambas fases:
+    // los léxicos (del Lexer) y los sintácticos (del Parser)
+    const std::vector<ErrorSintactico>& erroresSintacticos = parser->getErrores();
+
+    // Si no hay errores de ninguna fase, mostrar mensaje de éxito
+    if (errors.empty() && erroresSintacticos.empty()) {
         panelErrores->setPlainText("Análisis completado sin errores");
         return;
     }
-    
-    // Construir texto con todos los errores usando Error::toString()
-    // (escapa automáticamente caracteres especiales como \n, \t, etc.)
+
     QString texto;
-    for (const Error& error : errors) {
-        texto += QString::fromStdString(error.toString()) + "\n\n";
+
+    // --- Errores léxicos (usando Error::toString(), que escapa \n, \t, etc.) ---
+    if (!errors.empty()) {
+        texto += QString("========== ERRORES LÉXICOS (%1) ==========\n\n")
+                .arg(errors.size());
+        for (const Error& error : errors) {
+            texto += QString::fromStdString(error.toString()) + "\n\n";
+        }
     }
-    
+
+    // --- Errores sintácticos (del análisis predictivo) ---
+    if (!erroresSintacticos.empty()) {
+        texto += QString("========== ERRORES SINTÁCTICOS (%1) ==========\n\n")
+                .arg(erroresSintacticos.size());
+        for (const ErrorSintactico& error : erroresSintacticos) {
+            texto += QString::fromStdString(error.toString()) + "\n\n";
+        }
+    }
+
     // Establecer texto en el panel
     panelErrores->setPlainText(texto);
+}
+
+void MainWindow::actualizarPanelSintaxis() {
+    // Limpiar panel
+    panelSintaxis->clear();
+
+    QString texto;
+
+    // ===== VEREDICTO =====
+    if (parser->esCorrecto()) {
+        texto += "ANÁLISIS SINTÁCTICO: CORRECTO\n";
+        texto += "La cadena de entrada cumple la gramática de LIA\n\n";
+    } else {
+        texto += "ANÁLISIS SINTÁCTICO: CON ERRORES\n\n";
+        // Listar los errores sintácticos (el driver se detiene en el primero)
+        for (const ErrorSintactico& error : parser->getErrores()) {
+            texto += QString::fromStdString(error.toString()) + "\n\n";
+        }
+    }
+
+    // ===== PILA DE EJECUCIÓN (TRAZA) =====
+    // Si la traza es muy larga se muestra condensada (inicio y final),
+    // porque lo importante está en los primeros pasos y en el desenlace
+    const std::vector<std::string>& trazaCompleta = parser->getTraza();
+    const int totalPasos = static_cast<int>(trazaCompleta.size());
+    const int LIMITE_COMPLETA = 60;  // hasta aquí se muestra completa
+    const int PASOS_EXTREMO = 20;    // si es larga: primeros 20 y últimos 20
+
+    texto += QString("========== PILA DE EJECUCIÓN (%1 pasos) ==========\n")
+            .arg(totalPasos);
+
+    if (totalPasos <= LIMITE_COMPLETA) {
+        // Traza completa
+        for (int i = 0; i < totalPasos; i++) {
+            texto += QString("%1) %2\n")
+                    .arg(i + 1)
+                    .arg(QString::fromStdString(trazaCompleta[i]));
+        }
+    } else {
+        // Traza condensada: inicio + final
+        for (int i = 0; i < PASOS_EXTREMO; i++) {
+            texto += QString("%1) %2\n")
+                    .arg(i + 1)
+                    .arg(QString::fromStdString(trazaCompleta[i]));
+        }
+        texto += QString("\n   . . . (%1 pasos intermedios omitidos) . . .\n\n")
+                .arg(totalPasos - 2 * PASOS_EXTREMO);
+        for (int i = totalPasos - PASOS_EXTREMO; i < totalPasos; i++) {
+            texto += QString("%1) %2\n")
+                    .arg(i + 1)
+                    .arg(QString::fromStdString(trazaCompleta[i]));
+        }
+    }
+
+    // Establecer texto en el panel
+    panelSintaxis->setPlainText(texto);
 }
 
 void MainWindow::limpiarPaneles() {
     // Limpiar todos los paneles de resultados
     panelTokens->clear();
-    panelSintaxis->setPlainText("Proximamente");
+    panelSintaxis->clear();
     panelErrores->clear();
 }
 
