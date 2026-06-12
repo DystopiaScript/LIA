@@ -323,20 +323,11 @@ void MainWindow::actualizarPanelErrores(const std::vector<Error>& errors) {
         return;
     }
     
-    // Construir texto con todos los errores
+    // Construir texto con todos los errores usando Error::toString()
+    // (escapa automáticamente caracteres especiales como \n, \t, etc.)
     QString texto;
     for (const Error& error : errors) {
-        texto += QString("Error en línea %1, columna %2:\n")
-                .arg(error.linea)
-                .arg(error.columna);
-        texto += QString("  %1\n")
-                .arg(QString::fromStdString(error.descripcion));
-        if (!error.caracterProblematico.empty()) {
-            texto += QString("  Carácter problemático: '%1'\n\n")
-                    .arg(QString::fromStdString(error.caracterProblematico));
-        } else {
-            texto += "\n";
-        }
+        texto += QString::fromStdString(error.toString()) + "\n\n";
     }
     
     // Establecer texto en el panel

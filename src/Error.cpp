@@ -18,6 +18,28 @@ Error::Error(int lin, int col, int codigo, const std::string& car)
     descripcion = getDescripcionError(codigo);
 }
 
+// Convierte el error a string para visualización
+std::string Error::toString() const {
+    std::string resultado = "Error en línea " + std::to_string(linea) +
+                        ", columna " + std::to_string(columna) + ":\n";
+    resultado += "   " + descripcion + "\n";
+    if (!caracterProblematico.empty()) {
+        // Escapar caracteres especiales para que no rompan el formato del mensaje
+        std::string carDisplay;
+        for (char c : caracterProblematico) {
+            switch (c) {
+                case '\n': carDisplay += "\\n"; break;
+                case '\t': carDisplay += "\\t"; break;
+                case '\r': carDisplay += "\\r"; break;
+                case '\0': carDisplay += "EOF"; break;
+                default:   carDisplay += c;     break;
+            }
+        }
+        resultado += "   Carácter problemático: '" + carDisplay + "'";
+    }
+    return resultado;
+}
+
 // Obtiene la descripción del error según su código
 std::string Error::getDescripcionError(int codigoError) {
     switch (codigoError) {

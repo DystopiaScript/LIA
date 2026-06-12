@@ -62,7 +62,19 @@ public:
      * La descripción se genera automáticamente según el código
      */
     Error(int lin, int col, int codigo, const std::string& car);
-    
+
+    /**
+     * @brief Convierte el error a string para visualización
+     * @return String con formato de error completo
+     *
+     * Escapa caracteres especiales (\n, \t, \0) para no romper el formato.
+     * Formato:
+     * "Error en línea X, columna Y:
+     *    Descripción del error
+     *    Carácter problemático: 'char'"
+     */
+    std::string toString() const;
+
     /**
      * @brief Obtiene la descripción del error según su código
      * @param codigoError Código del error
